@@ -4,14 +4,25 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private TextView tempText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tempText = (TextView)findViewById(R.id.tempText);
+
+        InputChannel temp = new TempChannel();
+        temp.start();
+        tempText.setText( String.format("%3.2f%s", temp.getSample(),temp.getUnit()));
+
+        temp.stop();
+
     }
 
 

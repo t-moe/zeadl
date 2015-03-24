@@ -10,7 +10,20 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+
+        ndk {
+            moduleName "i2c"
+        }
     }
+
+    // Point Gradle at the directory where you want to root all of your native code
+    // There is a default directory but we prefer to control which directories to use
+    // and there will be a point later where keeping control over this is important
+    sourceSets.main {
+        jniLibs.srcDir 'src/main/libs'
+        jni.srcDirs = [] //disable automatic ndk-build call
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -23,3 +36,21 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
 }
+
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
+// Call regular ndk-build(.cmd) script from app directory
+task ndkBuild(type: Exec) {
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        commandLine 'ndk-build.cmd', '-C', file('src/main').absolutePath
+    } else {
+        commandLine 'ndk-build', '-C', file('src/main').absolutePath
+    }
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn ndkBuild
+}
+
+
