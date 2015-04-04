@@ -1,9 +1,12 @@
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.impl.temp;
+
+import ch.bfh.android.zeadl.I2C;
+import ch.bfh.android.zeadl.SensorChannel;
 
 /**
  * Created by timo on 3/24/15.
  */
-public class TempChannel implements InputChannel {
+public class I2CTempChannel implements SensorChannel {
 
   /* MCP9800 Register pointers */
   private static final char MCP9800_TEMP   = 0x00;      /* Ambient Temperature Register */
@@ -23,7 +26,10 @@ public class TempChannel implements InputChannel {
    private int fileHandle_temp;
    private boolean ready = false;
 
-
+    @Override
+    public String getName() {
+        return "Board Temp";
+    }
 
     @Override
     public void start() {
@@ -43,10 +49,6 @@ public class TempChannel implements InputChannel {
         return 100; //100samples per sec?
     }
 
-    @Override
-    public String getUnit() {
-        return "\u2103"; //grad celsisus
-    }
 
     @Override
     public double getSample() {

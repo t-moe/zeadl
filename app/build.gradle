@@ -20,7 +20,7 @@ android {
     // There is a default directory but we prefer to control which directories to use
     // and there will be a point later where keeping control over this is important
     sourceSets.main {
-        jniLibs.srcDir 'src/main/libs'
+        //jniLibs.srcDir 'src/main/libs'
         jni.srcDirs = [] //disable automatic ndk-build call
     }
 
@@ -39,7 +39,7 @@ dependencies {
 
 
 import org.apache.tools.ant.taskdefs.condition.Os
-
+/*
 // Call regular ndk-build(.cmd) script from app directory
 task ndkBuild(type: Exec) {
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -52,5 +52,5 @@ task ndkBuild(type: Exec) {
 tasks.withType(JavaCompile) {
     compileTask -> compileTask.dependsOn ndkBuild
 }
-
+*/
 

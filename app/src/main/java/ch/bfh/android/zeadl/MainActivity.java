@@ -6,6 +6,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.util.Collection;
+import java.util.List;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -17,11 +20,23 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         tempText = (TextView)findViewById(R.id.tempText);
 
-        InputChannel temp = new TempChannel();
-        temp.start();
-        tempText.setText( String.format("%3.2f%s", temp.getSample(),temp.getUnit()));
+        //InputChannel temp = new TempChannel();
+        //temp.start();
+        //tempText.setText( String.format("%3.2f%s", temp.getSample(),temp.getUnit()));
 
-        temp.stop();
+        //temp.stop();
+
+        List<SensorGroupFactory.SensorGroupInfo> strs = SensorGroupFactory.getAvailableGroups();
+
+        SensorGroup a = SensorGroupFactory.activate(strs.get(0));
+        SensorGroupFactory.getActiveGroups();
+
+        SensorChannel b = a.activate(a.getAvailableChannels().get(0));
+        a.getActiveChannels();
+        a.deactivate(b);
+
+
+        SensorGroupFactory.deactivate(strs.get(0));
 
     }
 

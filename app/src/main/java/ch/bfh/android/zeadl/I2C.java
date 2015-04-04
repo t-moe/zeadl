@@ -65,6 +65,6 @@ public class I2C
 
     static
     {
-        System.loadLibrary("i2c");
+      //  System.loadLibrary("i2c");
     }
 }
