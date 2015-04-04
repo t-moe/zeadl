@@ -21,6 +21,10 @@ public abstract class SensorGroup {
     private final List<SensorChannel> _activeSensorChannels = new ArrayList<SensorChannel>();
 
 
+    public final String getName() {
+        return this.getClass().getAnnotation(DisplayName.class).value();
+    }
+
     public final List<SensorChannelInfo> getAvailableChannels() {
         return Collections.unmodifiableList(_sensorChannels);
 
@@ -31,18 +35,21 @@ public abstract class SensorGroup {
 
     public final SensorChannel activate(SensorChannelInfo gi) {
         if(_activeSensorChannels.contains(gi)) return null;
+        gi.getInstance().start();
         _activeSensorChannels.add(gi.getInstance());
         return gi.getInstance();
 
     }
     public final boolean deactivate(SensorChannelInfo gi) {
         if(!_activeSensorChannels.contains(gi.getInstance())) return false;
+        gi.getInstance().stop();
         _activeSensorChannels.remove(gi.getInstance());
         return true;
     }
 
     public final boolean deactivate(SensorChannel ch) {
         if(!_activeSensorChannels.contains(ch)) return false;
+        ch.stop();
         _activeSensorChannels.remove(ch);
         return true;
     }

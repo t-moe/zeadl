@@ -51,7 +51,7 @@ public class I2CTempChannel implements SensorChannel {
 
 
     @Override
-    public double getSample() {
+    public float getSample() {
          if(!ready) throw new IllegalStateException();
 
           /* Setup i2c buffer for the configuration register */
@@ -71,7 +71,7 @@ public class I2CTempChannel implements SensorChannel {
          temp = temp >> 4;
 
         /* Convert current temperature to float */
-         double tempC = 1.0 * temp * 0.0625;
+         float tempC = 1.0f * temp * 0.0625f;
 
          return tempC;
     }

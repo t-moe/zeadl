@@ -8,5 +8,5 @@ public interface SensorChannel {
     public void start();
     public void stop();
     public int getMaximalSampleRate();
-    public double getSample();
+    public float getSample();
 }
