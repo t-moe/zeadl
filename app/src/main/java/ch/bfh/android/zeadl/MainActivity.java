@@ -1,5 +1,6 @@
 package ch.bfh.android.zeadl;
 
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -7,15 +8,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -36,60 +41,76 @@ public class MainActivity extends ActionBarActivity {
         //temp.stop();
 
 
-        LineChart chart = (LineChart) findViewById(R.id.chart);
-
         List<SensorGroupFactory.SensorGroupInfo> strs = SensorGroupFactory.getAvailableGroups();
         SensorGroup a = SensorGroupFactory.activate(strs.get(0));
-        chart.setDescription("");
-        chart.getAxisRight().setEnabled(false);
-        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-        chart.setHighlightEnabled(true);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-
-        chart.setPinchZoom(true);
-
-
-
         SensorGroupFactory.getActiveGroups();
 
-        SensorChannel b = a.activate(a.getAvailableChannels().get(0));
-
-        ArrayList<Entry> dat = new ArrayList<Entry>();
-        for(int i=0; i<10; i++) {
-            dat.add(new Entry(b.getSample(),i));
-        }
+        final SensorChannel b = a.activate(a.getAvailableChannels().get(0));
 
 
-        LineDataSet channel1Set = new LineDataSet(dat,b.getName());
 
-        ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
-        dataSets.add(channel1Set);
+        final GraphView graph = (GraphView) findViewById(R.id.graph);
+        graph.setTitle(a.getName());
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(new Date().getTime());
+        graph.getViewport().setMaxX(new Date().getTime() + (1000 * 60));
 
-        ArrayList<String> xVals = new ArrayList<String>();
-        for(int i=0; i<10; i++) {
-            xVals.add(i+"");
-        }
+        /*graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(30);*/
+
+        graph.getViewport().setScalable(true);
+        //graph.getViewport().setScrollable(true);
+
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
+        graph.getGridLabelRenderer().setVerticalAxisTitle(a.getUnit());
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,DateFormat.getTimeInstance()));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+
+        final LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
+        series.setTitle(b.getName());
+        series.setDrawDataPoints(true);
+
+        graph.addSeries(series);
+
+        graph.getLegendRenderer().setVisible(true);
+        //graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.BOTTOM);
 
 
-        LineData data = new LineData(xVals, dataSets);
-        chart.setData(data);
-        chart.invalidate(); // refresh
+        new Thread(new Runnable() {
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(1000, 0);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-        for(int i=0; i<10; i++) {
-            channel1Set.addEntry(new Entry(b.getSample(),i+10));
-        }
-        for(int i=0; i<10; i++) {
-            xVals.add((10+i)+"");
-        }
-        chart.invalidate(); // refresh
+                    final DataPoint d = new DataPoint(new Date(), b.getSample());
 
-        a.getActiveChannels();
-        a.deactivate(b);
+                    graph.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            series.appendData(d, false, 1000);
+                            //graph.getViewport().setMaxX(d.getX());
+                        }
+                    });
+                }
 
-        SensorGroupFactory.deactivate(strs.get(0));
+
+            }
+        }).start();
+
+        series.appendData(new DataPoint(new Date(),b.getSample()),false,1000);
+
+       // for(int i=0; i<29; i++) {
+        //    series.appendData(new DataPoint(i,b.getSample()),false,1000);
+       // }
+
+       // a.getActiveChannels();
+        //a.deactivate(b);
+
+        //SensorGroupFactory.deactivate(strs.get(0));
 
     }
 
