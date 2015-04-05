@@ -9,7 +9,7 @@ import ch.bfh.android.zeadl.impl.RandomChannel;
  */
 
 
-@DisplayName("Temperator Sensor")
+@DisplayName("Temperatur Sensor")
 public class TempSensorGroup  extends SensorGroup {
     public TempSensorGroup() {
         //addChannel(new I2CTempChannel());

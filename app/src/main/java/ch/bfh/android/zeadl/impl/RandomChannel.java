@@ -46,7 +46,7 @@ public class RandomChannel implements SensorChannel {
 
     @Override
     public float getSample() {
-        return (_rand.nextInt(((_max - _min) + 1)*100) + _min)/100.0f;
+        return (_rand.nextInt(((_max - _min) + 1)*100)/100f + _min);
 
     }
 }

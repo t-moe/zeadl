@@ -1,31 +1,42 @@
 package ch.bfh.android.zeadl;
 
-import android.os.Handler;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LegendRenderer;
-import com.jjoe64.graphview.Viewport;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.PointStyle;
+import org.achartengine.model.TimeSeries;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends ActionBarActivity {
 
     private TextView tempText;
+
+    private XYMultipleSeriesDataset mDataset;
+    private XYMultipleSeriesRenderer mRenderer;
+    private GraphicalView mChartView;
+    private TimeSeries ch1Series;
+    private TimeSeries ch2Series;
+    private LinearLayout layout;
+    private Date startTime;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,36 +56,85 @@ public class MainActivity extends ActionBarActivity {
         SensorGroup a = SensorGroupFactory.activate(strs.get(0));
         SensorGroupFactory.getActiveGroups();
 
-        final SensorChannel b = a.activate(a.getAvailableChannels().get(0));
+        final SensorChannel ch1 = a.activate(a.getAvailableChannels().get(0));
+        final SensorChannel ch2 = a.activate(a.getAvailableChannels().get(1));
 
 
 
-        final GraphView graph = (GraphView) findViewById(R.id.graph);
-        graph.setTitle(a.getName());
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(new Date().getTime());
-        graph.getViewport().setMaxX(new Date().getTime() + (1000 * 60));
+        layout = (LinearLayout) findViewById(R.id.chart);
 
-        /*graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(30);*/
+        // create dataset and renderer
+        mDataset = new XYMultipleSeriesDataset();
+        mRenderer = new XYMultipleSeriesRenderer();
 
-        graph.getViewport().setScalable(true);
-        //graph.getViewport().setScrollable(true);
+        //Colors
+        mRenderer.setApplyBackgroundColor(true);
+        mRenderer.setBackgroundColor(Color.LTGRAY);
+        mRenderer.setMarginsColor(Color.WHITE);
+        mRenderer.setXLabelsColor(Color.DKGRAY);
+        mRenderer.setYLabelsColor(0,Color.DKGRAY);
+        mRenderer.setLabelsColor(Color.BLACK);
+        mRenderer.setGridColor(Color.GRAY);
 
-        graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
-        graph.getGridLabelRenderer().setVerticalAxisTitle(a.getUnit());
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this,DateFormat.getTimeInstance()));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+        //TextSizes
+        mRenderer.setAxisTitleTextSize(21);
+        mRenderer.setChartTitleTextSize(30);
+        mRenderer.setLabelsTextSize(25);
+        mRenderer.setLegendTextSize(25);
 
-        final LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
-        series.setTitle(b.getName());
-        series.setDrawDataPoints(true);
+        //Spacings
+        mRenderer.setMargins(new int[]{50, 80, 50, 50});
+        mRenderer.setYLabelsAlign(Paint.Align.RIGHT, 0);
+        mRenderer.setYLabelsPadding(10);
 
-        graph.addSeries(series);
+        mRenderer.setPointSize(10f);
+        mRenderer.setClickEnabled(false);
+        //mRenderer.setSelectableBuffer(30);
+        mRenderer.setPanEnabled(true,true);
+        mRenderer.setZoomEnabled(true, true);
+        mRenderer.setShowGridY(true);
 
-        graph.getLegendRenderer().setVisible(true);
-        //graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.BOTTOM);
+
+        XYSeriesRenderer ch1Renderer = new XYSeriesRenderer();
+        ch1Renderer.setColor(Color.BLUE);
+        ch1Renderer.setPointStyle(PointStyle.CIRCLE);
+        ch1Renderer.setFillPoints(true);
+        ch1Renderer.setLineWidth(3f);
+        ch1Renderer.setDisplayChartValues(true);
+        ch1Renderer.setDisplayChartValuesDistance(100);
+        ch1Renderer.setChartValuesTextSize(20);
+        ch1Renderer.setChartValuesFormat(NumberFormat.getInstance());
+        ch1Renderer.setChartValuesSpacing(20);
+
+
+        mRenderer.addSeriesRenderer(ch1Renderer);
+        XYSeriesRenderer ch2Renderer = new XYSeriesRenderer();
+        ch2Renderer.setColor(Color.RED);
+        ch2Renderer.setPointStyle(PointStyle.CIRCLE);
+        ch2Renderer.setFillPoints(true);
+        ch2Renderer.setLineWidth(3f);
+        mRenderer.addSeriesRenderer(ch2Renderer);
+
+
+        mRenderer.setChartTitle(a.getName());
+        ch1Series = new TimeSeries(ch1.getName());
+        ch2Series = new TimeSeries(ch2.getName());
+
+        mRenderer.setXTitle("time");
+        mRenderer.setYTitle(a.getUnit());
+
+        mDataset.addSeries(ch1Series);
+        mDataset.addSeries(ch2Series);
+
+        mChartView = ChartFactory.getTimeChartView(this, mDataset, mRenderer,
+                "H:mm:ss");
+
+
+        layout.addView(mChartView);
+
+        startTime = new Date();
+
+
 
 
         new Thread(new Runnable() {
@@ -86,14 +146,20 @@ public class MainActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
 
-                    final DataPoint d = new DataPoint(new Date(), b.getSample());
-
-                    graph.post(new Runnable() {
+                    mChartView.post(new Runnable() {
                         @Override
                         public void run() {
-                            series.appendData(d, false, 1000);
-                            //graph.getViewport().setMaxX(d.getX());
+                            Date d = new Date();
+
+                            ch1Series.add(d, ch1.getSample());
+                            ch2Series.add(d, ch2.getSample());
+
+                            //mRenderer.setPanLimits(new double[]{startTime.getTime(), d.getTime() + 1000, 0, 60});
+                            //mRenderer.setZoomLimits(new double[]{startTime.getTime(),d.getTime(),0,0});
+
+                            mChartView.repaint();
                         }
+
                     });
                 }
 
@@ -101,14 +167,11 @@ public class MainActivity extends ActionBarActivity {
             }
         }).start();
 
-        series.appendData(new DataPoint(new Date(),b.getSample()),false,1000);
 
-       // for(int i=0; i<29; i++) {
-        //    series.appendData(new DataPoint(i,b.getSample()),false,1000);
-       // }
 
        // a.getActiveChannels();
-        //a.deactivate(b);
+        //a.deactivate(ch1);
+        //a.deactivate(ch2);
 
         //SensorGroupFactory.deactivate(strs.get(0));
 

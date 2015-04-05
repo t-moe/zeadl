@@ -14,14 +14,22 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <LinearLayout
+        android:id="@+id/chart"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/tempText"
+        android:layout_centerHorizontal="true"></LinearLayout>
+
     <!---<com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />-->
 
-    <com.jjoe64.graphview.GraphView
+    <!--<com.jjoe64.graphview.GraphView
         android:layout_width="match_parent"
         android:layout_height="200dip"
-        android:id="@+id/graph" />
+        android:id="@+id/graph" />-->
 
 </RelativeLayout>
