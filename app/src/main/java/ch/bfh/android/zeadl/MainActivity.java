@@ -52,13 +52,30 @@ public class MainActivity extends ActionBarActivity {
         //temp.stop();
 
 
-        List<SensorGroupFactory.SensorGroupInfo> strs = SensorGroupFactory.getAvailableGroups();
-        SensorGroup a = SensorGroupFactory.activate(strs.get(0));
+        SensorGroup tempGroup;
+        List<SensorGroup> activeGroups = SensorGroupFactory.getActiveGroups();
+        if(activeGroups.size()==0) {
+            List<SensorGroupFactory.SensorGroupInfo> strs = SensorGroupFactory.getAvailableGroups();
+            tempGroup= SensorGroupFactory.activate(strs.get(0));
+        } else
+        {
+            tempGroup = activeGroups.get(0);
+        }
         SensorGroupFactory.getActiveGroups();
 
-        final SensorChannel ch1 = a.activate(a.getAvailableChannels().get(0));
-        final SensorChannel ch2 = a.activate(a.getAvailableChannels().get(1));
-
+        SensorChannel ch1tmp;
+        SensorChannel ch2tmp;
+        List<SensorChannel> tempChannels = tempGroup.getActiveChannels();
+        if(tempChannels.size()==0) {
+            List<SensorGroup.SensorChannelInfo> avails = tempGroup.getAvailableChannels();
+            ch1tmp = tempGroup.activate(avails.get(0));
+            ch2tmp = tempGroup.activate(avails.get(1));
+        } else {
+            ch1tmp = tempChannels.get(0);
+            ch2tmp = tempChannels.get(1);
+        }
+        final SensorChannel ch1 = ch1tmp;
+        final SensorChannel ch2 = ch2tmp;
 
 
         layout = (LinearLayout) findViewById(R.id.chart);
@@ -116,12 +133,12 @@ public class MainActivity extends ActionBarActivity {
         mRenderer.addSeriesRenderer(ch2Renderer);
 
 
-        mRenderer.setChartTitle(a.getName());
+        mRenderer.setChartTitle(tempGroup.getName());
         ch1Series = new TimeSeries(ch1.getName());
         ch2Series = new TimeSeries(ch2.getName());
 
         mRenderer.setXTitle("time");
-        mRenderer.setYTitle(a.getUnit());
+        mRenderer.setYTitle(tempGroup.getUnit());
 
         mDataset.addSeries(ch1Series);
         mDataset.addSeries(ch2Series);
