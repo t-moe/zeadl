@@ -12,6 +12,8 @@ import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
 public abstract class SensorGroup {
     public abstract String getUnit();
 
+    public abstract int getMaximalSampleRate();
+
 
     protected final void addChannel(SensorChannel channel) {
         _sensorChannels.add(new SensorChannelInfo(channel));

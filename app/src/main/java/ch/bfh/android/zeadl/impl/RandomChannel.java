@@ -37,11 +37,6 @@ public class RandomChannel implements SensorChannel {
 
     }
 
-    @Override
-    public int getMaximalSampleRate() {
-        return 0;
-    }
-
     private Random _rand = new Random();
 
     @Override

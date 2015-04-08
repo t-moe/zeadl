@@ -7,6 +7,5 @@ public interface SensorChannel {
     public String getName();
     public void start();
     public void stop();
-    public int getMaximalSampleRate();
     public float getSample();
 }

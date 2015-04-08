@@ -1,5 +1,8 @@
 package ch.bfh.android.zeadl.impl.temp;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import ch.bfh.android.zeadl.I2C;
 import ch.bfh.android.zeadl.SensorChannel;
 
@@ -21,9 +24,8 @@ public class I2CTempChannel implements SensorChannel {
   /* i2c device file name */
   private static final String MCP9800_FILE_NAME = "/dev/i2c-3";
 
-   private I2C i2c_temp = new I2C();
-   private  int[] i2cCommBuffer_temp = new int[16];
-   private int fileHandle_temp;
+   private I2C i2c_temp;
+   private  byte[] i2cCommBuffer_temp = new byte[16];
    private boolean ready = false;
 
     @Override
@@ -33,22 +35,18 @@ public class I2CTempChannel implements SensorChannel {
 
     @Override
     public void start() {
-        fileHandle_temp = i2c_temp.open(MCP9800_FILE_NAME);
-        int status = i2c_temp.SetSlaveAddress(fileHandle_temp, MCP9800_I2C_ADDR); //TODO: Check return code
+       i2c_temp  = new I2C(MCP9800_FILE_NAME,MCP9800_I2C_ADDR);
+        if(!i2c_temp.open()) {
+            return; //TODO handle error
+        }
         ready= true;
     }
 
     @Override
     public void stop() {
-        i2c_temp.close(fileHandle_temp);
+        i2c_temp.close();
         ready=false;
     }
-
-    @Override
-    public int getMaximalSampleRate() {
-        return 100; //100samples per sec?
-    }
-
 
     @Override
     public float getSample() {
@@ -57,17 +55,18 @@ public class I2CTempChannel implements SensorChannel {
           /* Setup i2c buffer for the configuration register */
          i2cCommBuffer_temp[0] = MCP9800_CONFIG;
          i2cCommBuffer_temp[1] = MCP9800_12_BIT;
-         int status = i2c_temp.write(fileHandle_temp, i2cCommBuffer_temp, 2);
+         int status = i2c_temp.write(i2cCommBuffer_temp, 2);
 
         /* Setup mcp9800 register to read the temperature */
          i2cCommBuffer_temp[0] =MCP9800_TEMP;
-         i2c_temp.write(fileHandle_temp, i2cCommBuffer_temp, 1);
+         i2c_temp.write(i2cCommBuffer_temp, 1);
 
         /* Read the current temperature from the mcp9800 device */
-         i2c_temp.read(fileHandle_temp, i2cCommBuffer_temp, 2);
+         i2c_temp.read(i2cCommBuffer_temp, 2);
 
         /* Assemble the temperature values */
-         int temp = ((i2cCommBuffer_temp[0] << 8) | i2cCommBuffer_temp[1]);
+         int temp =ByteBuffer.wrap(i2cCommBuffer_temp,0,2).getShort();
+         //int temp = ((((int)i2cCommBuffer_temp[0] & 0xFF) << 8) | ((int)i2cCommBuffer_temp[1]& 0xFF));
          temp = temp >> 4;
 
         /* Convert current temperature to float */

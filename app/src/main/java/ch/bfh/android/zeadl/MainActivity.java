@@ -2,6 +2,7 @@ package ch.bfh.android.zeadl;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -35,9 +36,6 @@ public class MainActivity extends ActionBarActivity {
     private LinearLayout layout;
     private Date startTime;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +48,6 @@ public class MainActivity extends ActionBarActivity {
         //tempText.setText( String.format("%3.2f%s", temp.getSample(),temp.getUnit()));
 
         //temp.stop();
-
 
         SensorGroup tempGroup;
         List<SensorGroup> activeGroups = SensorGroupFactory.getActiveGroups();
