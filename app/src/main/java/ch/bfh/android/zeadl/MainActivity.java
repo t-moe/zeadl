@@ -1,8 +1,13 @@
 package ch.bfh.android.zeadl;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -22,6 +28,8 @@ import org.achartengine.renderer.XYSeriesRenderer;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
+
+import ch.bfh.android.zeadl.service.LocalService;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -189,8 +197,11 @@ public class MainActivity extends ActionBarActivity {
 
         //SensorGroupFactory.deactivate(strs.get(0));
 
+         intent= new Intent(this, LocalService.class);
+        startService(intent);
+        //doBindService();
     }
-
+    Intent intent;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -213,4 +224,63 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private LocalService mBoundService;
+    private boolean mIsBound;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+
+
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mBoundService = ((LocalService.LocalBinder)service).getService();
+
+            // Tell the user about this for our demo.
+            Toast.makeText(MainActivity.this, R.string.local_service_connected,
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mBoundService = null;
+            Toast.makeText(MainActivity.this, R.string.local_service_disconnected,
+                    Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    void doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        bindService(new Intent(MainActivity.this,
+                LocalService.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(intent);
+        //doUnbindService();
+    }
+
+
 }

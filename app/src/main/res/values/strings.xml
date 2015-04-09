@@ -3,4 +3,9 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="local_service_started">Zeadle Service started</string>
+    <string name="local_service_stopped">Zeadle Service stopped</string>
+    <string name="local_service_connected">Zeadle Service connected</string>
+    <string name="local_service_disconnected">Zeadle Service disconnected</string>
+    <string name="local_service_label">Zeadle Service</string>
 </resources>

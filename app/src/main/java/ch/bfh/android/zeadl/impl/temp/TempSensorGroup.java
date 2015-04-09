@@ -15,7 +15,7 @@ import ch.bfh.android.zeadl.impl.RandomChannel;
 public class TempSensorGroup  extends SensorGroup {
     public TempSensorGroup() {
         if(!Build.FINGERPRINT.startsWith("generic")) { //not in emulator
-            addChannel(new I2CTempChannel());
+           // addChannel(new I2CTempChannel());
         }
         addChannel(new RandomChannel("Ambient Temp (Rand)",10,30));
         addChannel(new RandomChannel("Inner Temp (Rand)",20,25));
