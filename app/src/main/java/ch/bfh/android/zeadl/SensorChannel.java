@@ -49,9 +49,7 @@ public abstract class SensorChannel {
      * Sets the rendering color of the channel
      * @param color color to use for drawings
      */
-    public final synchronized void  setColor(int color) {
+    public final synchronized void setColor(int color) {
         mColor = color;
     }
-
-
 }

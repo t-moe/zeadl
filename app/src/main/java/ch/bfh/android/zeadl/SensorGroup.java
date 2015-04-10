@@ -2,10 +2,11 @@ package ch.bfh.android.zeadl;
 
 import android.provider.ContactsContract;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EventListener;
+import java.util.EventObject;
 import java.util.List;
 
 public abstract class SensorGroup {
@@ -51,13 +52,15 @@ public abstract class SensorGroup {
      * Class which holds Data for all SensorChannels of a SensorGroup during a certain interval.
      * If you add or remove SensorChannels a new DataSegment will be created
      */
-    static class DataSegment {
+    public static class DataSegment {
         private final List<SensorChannel> mChannels;
         private final List<Entry> mEntries;
+        private final SensorGroup mSource;
 
-        private DataSegment(List<SensorChannel> channels) {
+        private DataSegment(SensorGroup source, List<SensorChannel> channels) {
             mChannels = channels;
             mEntries = new ArrayList<Entry>();
+            mSource=source;
         }
 
         /**
@@ -80,16 +83,53 @@ public abstract class SensorGroup {
          * Appends a new Entry to the DataSegment
          * @param e The new entry to add. Must values must correspond to the number of channels of this segment
          */
-        public final synchronized  void addEntry(Entry e) {
+        public final synchronized void addEntry(final Entry e) {
             if(e.getChannelData().size()!=mChannels.size())
                 throw new IllegalArgumentException();
             mEntries.add(e);
+            synchronized (mListeners) {
+                for (EntryAddedListener listener : mListeners) {
+                    listener.onEntryAdded(new EntryAddedEvent(this,e));
+                }
+            }
         }
+
+        public final SensorGroup getSensorGroup() {
+            return mSource;
+        }
+
+        public static class EntryAddedEvent extends EventObject {
+            private final  Entry mEntry;
+            private EntryAddedEvent(Object source, final Entry entry) {
+                super(source);
+                mEntry = entry;
+            }
+            public final Entry getEntry() {
+                return mEntry;
+            }
+        }
+        public interface EntryAddedListener  extends EventListener {
+            public void onEntryAdded(final EntryAddedEvent event);
+        }
+
+        private final List<EntryAddedListener> mListeners = new ArrayList<EntryAddedListener>();
+        public synchronized void addEventListener(final EntryAddedListener listener)  {
+            synchronized (mListeners) {
+                mListeners.add(listener);
+            }
+        }
+        public synchronized void removeEventListener(final EntryAddedListener listener)   {
+            synchronized (mListeners) {
+                mListeners.remove(listener);
+            }
+        }
+
+
 
         /**
          * Class which holds DataPoints of all channels of a SensorGroup for one single point in time
          */
-        static class Entry {
+        public static class Entry {
             private final Date mTime;
             private final List<Float> mDataList;
 
@@ -98,7 +138,7 @@ public abstract class SensorGroup {
              * @param time The timestamp of the entry
              * @param data The Data of the single channels
              */
-            public Entry(Date time, List<Float> data) {
+            public Entry(final Date time, final List<Float> data) {
                 mDataList = data;
                 mTime = time;
             }
@@ -122,7 +162,7 @@ public abstract class SensorGroup {
 
     }
 
-   private List<DataSegment> mDataSegments = new ArrayList<DataSegment>();
+   private final  List<DataSegment> mDataSegments = new ArrayList<DataSegment>();
 
     /**
      * Returns all available DataSegments
@@ -187,12 +227,27 @@ public abstract class SensorGroup {
      */
     public synchronized final SensorChannel activate(ChannelInfo ci) {
         if(mActiveSensorChannels.contains(ci)) return null;
-        ci.getInstance().start();
+        SensorChannel channel =ci.getInstance();
+        channel.start();
         mActiveSensorChannels.add(ci.getInstance());
-        synchronized (mDataSegments) {
-            mDataSegments.add(new DataSegment(mActiveSensorChannels));
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onActiveChannelsChanged(new ActiveChannelModificationEvent(this, ActiveChannelModificationEvent.Type.CHANNEL_ACTIVATED, channel));
+            }
         }
-        return ci.getInstance();
+
+        synchronized (mDataSegments) {
+            if(!mActiveSensorChannels.isEmpty()) {
+                DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                mDataSegments.add(newSegment);
+                synchronized (mListeners) {
+                    for(UpdateListener listener : mListeners) {
+                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(this,newSegment));
+                    }
+                }
+            }
+        }
+        return channel;
 
     }
 
@@ -202,11 +257,26 @@ public abstract class SensorGroup {
      * @return bool on success
      */
     public synchronized final boolean deactivate(ChannelInfo ci) {
-        if(!mActiveSensorChannels.contains(ci.getInstance())) return false;
-        ci.getInstance().stop();
-        mActiveSensorChannels.remove(ci.getInstance());
+        SensorChannel channel =ci.getInstance();
+        if(!mActiveSensorChannels.contains(channel)) return false;
+        channel.stop();
+        mActiveSensorChannels.remove(channel);
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onActiveChannelsChanged(new ActiveChannelModificationEvent(this,ActiveChannelModificationEvent.Type.CHANNEL_DEACTIVATED, channel));
+            }
+        }
+
         synchronized (mDataSegments) {
-            mDataSegments.add(new DataSegment(mActiveSensorChannels));
+            if(!mActiveSensorChannels.isEmpty()) {
+                DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                mDataSegments.add(newSegment);
+                synchronized (mListeners) {
+                    for (UpdateListener listener : mListeners) {
+                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(this,newSegment));
+                    }
+                }
+            }
         }
         return true;
     }
@@ -220,8 +290,21 @@ public abstract class SensorGroup {
         if(!mActiveSensorChannels.contains(ch)) return false;
         ch.stop();
         mActiveSensorChannels.remove(ch);
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onActiveChannelsChanged(new ActiveChannelModificationEvent(this,ActiveChannelModificationEvent.Type.CHANNEL_DEACTIVATED, ch));
+            }
+        }
         synchronized (mDataSegments) {
-            mDataSegments.add(new DataSegment(mActiveSensorChannels));
+            if(!mActiveSensorChannels.isEmpty()) {
+                DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                mDataSegments.add(newSegment);
+                synchronized (mListeners) {
+                    for (UpdateListener listener : mListeners) {
+                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(this,newSegment));
+                    }
+                }
+            }
         }
         return true;
     }
@@ -230,7 +313,7 @@ public abstract class SensorGroup {
     /**
      * Class which holds metadata about a SensorChannel. Pass an instance of this class to activate in order to get the instance of the implementation.
      */
-    static class ChannelInfo {
+    public static class ChannelInfo {
         private ChannelInfo(SensorChannel ch) {
             mInstance = ch;
         }
@@ -246,5 +329,56 @@ public abstract class SensorGroup {
         }
         private SensorChannel mInstance;
     }
+
+
+
+    public static class ActiveChannelModificationEvent extends EventObject {
+        public enum Type {
+            CHANNEL_ACTIVATED,
+            CHANNEL_DEACTIVATED,
+        }
+        private Type mType;
+        private SensorChannel mChannel;
+        private ActiveChannelModificationEvent(final Object source, final Type type, final SensorChannel channel) {
+            super(source);
+            mChannel=channel;
+            mType=type;
+        }
+        public final Type getType() {
+            return mType;
+        }
+        public final SensorChannel getChannel () {
+            return mChannel;
+        }
+    }
+
+    public static class DataSegmentAddedEvent extends EventObject {
+        private DataSegment mDataSegment;
+        private DataSegmentAddedEvent(final Object source, final DataSegment segment) {
+            super(source);
+            mDataSegment = segment;
+        }
+        public final DataSegment getDataSegment() {
+            return mDataSegment;
+        }
+    }
+
+    public interface UpdateListener extends EventListener {
+        public void onActiveChannelsChanged(final ActiveChannelModificationEvent event);
+        public void onDataSegmentAdded(final DataSegmentAddedEvent event);
+    }
+
+    private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
+    public synchronized void addEventListener(UpdateListener listener)  {
+        synchronized (mListeners) {
+            mListeners.add(listener);
+        }
+    }
+    public synchronized void removeEventListener(UpdateListener listener)   {
+        synchronized (mListeners) {
+            mListeners.remove(listener);
+        }
+    }
+
 
 }

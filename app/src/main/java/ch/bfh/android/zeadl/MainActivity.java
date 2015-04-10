@@ -26,7 +26,7 @@ import java.util.List;
 import ch.bfh.android.zeadl.service.ServiceHelper;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements SensorGroup.UpdateListener, SensorGroup.DataSegment.EntryAddedListener {
 
 
     private ServiceHelper serviceHelper;
@@ -40,6 +40,25 @@ public class MainActivity extends ActionBarActivity {
     private TimeSeries ch2Series;
     private LinearLayout layout;
     private Date startTime;
+
+
+
+
+    @Override
+    public void onEntryAdded(SensorGroup.DataSegment.EntryAddedEvent event) {
+
+    }
+
+    @Override
+    public void onActiveChannelsChanged(SensorGroup.ActiveChannelModificationEvent event) {
+
+    }
+
+    @Override
+    public void onDataSegmentAdded(SensorGroup.DataSegmentAddedEvent event) {
+        event.getDataSegment().addEventListener(this);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +81,7 @@ public class MainActivity extends ActionBarActivity {
         if(activeGroups.size()==0) {
             List<SensorGroupFactory.GroupInfo> strs = SensorGroupFactory.getAvailableGroups();
             tempGroup= SensorGroupFactory.activate(strs.get(0));
+            tempGroup.addEventListener(this);
         } else
         {
             tempGroup = activeGroups.get(0);
@@ -159,13 +179,19 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-        new Thread(new Runnable() {
+        /*t = new Thread(new Runnable() {
             public void run() {
                 while(true) {
                     try {
                         Thread.sleep(1000, 0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }
+
+                    for(SensorGroup group : SensorGroupFactory.getActiveGroups()) {
+                        SensorGroup.DataSegment segment = group.getLastDataSegment();
+                        Log.d("Datalog","Sensor Group "+group.getName()+" has "+segment.getEntries().size() + " entries in the last datasegment ("+segment.getChannels().size()+")");
+
                     }
 
                     mChartView.post(new Runnable() {
@@ -187,7 +213,8 @@ public class MainActivity extends ActionBarActivity {
 
 
             }
-        }).start();
+        });
+        t.start();*/
 
 
 
@@ -203,6 +230,7 @@ public class MainActivity extends ActionBarActivity {
         Log.d("MainActivity","On create");
     }
 
+    Thread t;
 
     public MainActivity() {
         Log.d("MainActivity","Ctor");
@@ -270,7 +298,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
         Log.d("MainActivity","On destroy");
         super.onDestroy();
+        //t.stop();
     }
-
 
 }

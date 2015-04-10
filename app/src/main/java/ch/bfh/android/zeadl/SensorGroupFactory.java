@@ -30,7 +30,7 @@ public final class SensorGroupFactory {
     /**
      * Class which holds metadata about a SensorGroup. Pass an instance of this class to activate in order to get the instance of the implementation.
      */
-    static class GroupInfo {
+    public static class GroupInfo {
         private GroupInfo(Class cl) {
             _class = cl;
             _instance = null;
