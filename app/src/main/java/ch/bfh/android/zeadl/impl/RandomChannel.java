@@ -7,7 +7,7 @@ import ch.bfh.android.zeadl.SensorChannel;
 /**
  * Created by timo on 4/4/15.
  */
-public class RandomChannel implements SensorChannel {
+public class RandomChannel extends SensorChannel {
 
 
     private String _name;

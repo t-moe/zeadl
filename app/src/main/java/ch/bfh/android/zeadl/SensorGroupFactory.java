@@ -1,11 +1,7 @@
 package ch.bfh.android.zeadl;
 
-import android.hardware.Sensor;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
@@ -15,21 +11,27 @@ import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
  */
 
 
-
+/**
+ * Static class which provides access to all available and active sensor groups.
+ * You can activate/deactivate/query all Sensor Groups with this Class
+ */
 public final class SensorGroupFactory {
 
-    private final static List<SensorGroupInfo> _sensorGroups = new ArrayList<SensorGroupInfo>();
+    private final static List<GroupInfo> _sensorGroups = new ArrayList<GroupInfo>();
     private final static List<SensorGroup> _activeSensorGroups = new ArrayList<SensorGroup>();
     static {
         //Add available sensor groups here
-        _sensorGroups.add(new SensorGroupInfo(TempSensorGroup.class));
+        _sensorGroups.add(new GroupInfo(TempSensorGroup.class));
 
         //TODO: Find the classes automatically using reflection
     }
 
 
-    static class SensorGroupInfo {
-        private SensorGroupInfo(Class cl) {
+    /**
+     * Class which holds metadata about a SensorGroup. Pass an instance of this class to activate in order to get the instance of the implementation.
+     */
+    static class GroupInfo {
+        private GroupInfo(Class cl) {
             _class = cl;
             _instance = null;
             if(!SensorGroup.class.isAssignableFrom(cl))
@@ -57,6 +59,10 @@ public final class SensorGroupFactory {
             return _instance;
         }
 
+        /**
+         * Returns the name of the SensorGroup
+         * @return
+         */
         public final String getName() {
             return _name;
         }
@@ -67,8 +73,12 @@ public final class SensorGroupFactory {
     }
 
 
-
-    public static final SensorGroup activate(SensorGroupInfo gi) {
+    /**
+     * Activates a Sensor Group.
+     * @param gi The GroupInfo object retrived from getAvailableGroups()
+     * @return The instance of the activated SensorGroup or null on error
+     */
+    public static synchronized final SensorGroup activate(GroupInfo gi) {
         if(gi.getInstance()!=null && _activeSensorGroups.contains(gi.getInstance())) return null;
         if(gi.create()) {
             _activeSensorGroups.add(gi.getInstance());
@@ -77,27 +87,41 @@ public final class SensorGroupFactory {
         return null;
     }
 
-    public static final boolean deactivate(SensorGroup group) {
+    /**
+     * Deactivates a Sensor Group
+     * @param group The instance of the group to deactivate
+     * @return bool on success
+     */
+    public static synchronized final boolean deactivate(SensorGroup group) {
         if(!_activeSensorGroups.contains(group)) return false;
         _activeSensorGroups.remove(group);
         return true;
     }
 
-    public static final boolean deactivate(SensorGroupInfo gi) {
+    /**
+     * Deactivates a Sensor Group
+     * @param gi The GroupInfo object retrived from getAvailableGroups()
+     * @return bool on success
+     */
+    public static synchronized final boolean deactivate(GroupInfo gi) {
         if(!_activeSensorGroups.contains(gi.getInstance())) return false;
         _activeSensorGroups.remove(gi.getInstance());
         return true;
     }
 
-    public static final List<SensorGroupInfo> getAvailableGroups() {
+    /**
+     * Returns all available SensorGroups
+     * @return
+     */
+    public static final List<GroupInfo> getAvailableGroups() {
         return Collections.unmodifiableList(_sensorGroups);
     }
 
+    /**
+     * Returns all active SensorGroups
+     * @return
+     */
     public static final List<SensorGroup> getActiveGroups() {
         return Collections.unmodifiableList(_activeSensorGroups);
     }
-
-
-
-
 }

@@ -3,6 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_exit">Exit</string>
     <string name="local_service_started">Zeadle Service started</string>
     <string name="local_service_stopped">Zeadle Service stopped</string>
     <string name="local_service_connected">Zeadle Service connected</string>

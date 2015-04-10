@@ -15,6 +15,7 @@ import ch.bfh.android.zeadl.R;
 
 public class LocalService extends Service {
     private NotificationManager mNM;
+    private WorkerThread mThread;
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
@@ -33,10 +34,13 @@ public class LocalService extends Service {
 
     @Override
     public void onCreate() {
+        mThread = new WorkerThread();
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
+
+        mThread.execute();
     }
 
     @Override
@@ -49,6 +53,8 @@ public class LocalService extends Service {
 
     @Override
     public void onDestroy() {
+        mThread.cancel(true);
+
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
 
@@ -77,12 +83,29 @@ public class LocalService extends Service {
                 System.currentTimeMillis());
 
         // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+       PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
+
+
+       /* Intent resultIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+// Adds the back stack
+        stackBuilder.addParentStack(MainActivity.class);
+// Adds the Intent to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+// Gets a PendingIntent containing the entire back stack
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+*/
+
+
+
+
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, getText(R.string.local_service_label),
-                text, contentIntent);
+                text, resultPendingIntent);
 
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);

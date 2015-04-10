@@ -1,21 +1,15 @@
 package ch.bfh.android.zeadl;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
-import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -29,10 +23,13 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
 
-import ch.bfh.android.zeadl.service.LocalService;
+import ch.bfh.android.zeadl.service.ServiceHelper;
 
 
 public class MainActivity extends ActionBarActivity {
+
+
+    private ServiceHelper serviceHelper;
 
     private TextView tempText;
 
@@ -47,6 +44,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        serviceHelper = new ServiceHelper(this);
+        serviceHelper.EnsureStarted();
+
         setContentView(R.layout.activity_main);
         tempText = (TextView)findViewById(R.id.tempText);
 
@@ -60,7 +60,7 @@ public class MainActivity extends ActionBarActivity {
         SensorGroup tempGroup;
         List<SensorGroup> activeGroups = SensorGroupFactory.getActiveGroups();
         if(activeGroups.size()==0) {
-            List<SensorGroupFactory.SensorGroupInfo> strs = SensorGroupFactory.getAvailableGroups();
+            List<SensorGroupFactory.GroupInfo> strs = SensorGroupFactory.getAvailableGroups();
             tempGroup= SensorGroupFactory.activate(strs.get(0));
         } else
         {
@@ -72,7 +72,7 @@ public class MainActivity extends ActionBarActivity {
         SensorChannel ch2tmp;
         List<SensorChannel> tempChannels = tempGroup.getActiveChannels();
         if(tempChannels.size()==0) {
-            List<SensorGroup.SensorChannelInfo> avails = tempGroup.getAvailableChannels();
+            List<SensorGroup.ChannelInfo> avails = tempGroup.getAvailableChannels();
             ch1tmp = tempGroup.activate(avails.get(0));
             ch2tmp = tempGroup.activate(avails.get(1));
         } else {
@@ -197,11 +197,47 @@ public class MainActivity extends ActionBarActivity {
 
         //SensorGroupFactory.deactivate(strs.get(0));
 
-         intent= new Intent(this, LocalService.class);
-        startService(intent);
+
         //doBindService();
+
+        Log.d("MainActivity","On create");
     }
-    Intent intent;
+
+
+    public MainActivity() {
+        Log.d("MainActivity","Ctor");
+    }
+
+    @Override
+    protected  void onRestart() {
+        super.onRestart();
+        Log.d("MainActivity","On  restart");
+    }
+
+    @Override
+    protected  void onStart() {
+        super.onStart();
+        serviceHelper.Attach();
+        Log.d("MainActivity","On start");
+    }
+
+    @Override
+    protected  void onStop() {
+        super.onStop();
+        serviceHelper.Detach();
+        Log.d("MainActivity","On stop");
+    }
+    @Override
+    protected  void onPause() {
+        super.onPause();
+        Log.d("MainActivity","On pause");
+    }
+
+    @Override
+    protected  void onResume() {
+        super.onResume();
+        Log.d("MainActivity","On resume");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -218,7 +254,9 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_exit) {
+            serviceHelper.Stop();
+            this.finish();
             return true;
         }
 
@@ -226,60 +264,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    private LocalService mBoundService;
-    private boolean mIsBound;
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-
-
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the service object we can use to
-            // interact with the service.  Because we have bound to a explicit
-            // service that we know is running in our own process, we can
-            // cast its IBinder to a concrete class and directly access it.
-            mBoundService = ((LocalService.LocalBinder)service).getService();
-
-            // Tell the user about this for our demo.
-            Toast.makeText(MainActivity.this, R.string.local_service_connected,
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            // Because it is running in our same process, we should never
-            // see this happen.
-            mBoundService = null;
-            Toast.makeText(MainActivity.this, R.string.local_service_disconnected,
-                    Toast.LENGTH_SHORT).show();
-        }
-    };
-
-    void doBindService() {
-        // Establish a connection with the service.  We use an explicit
-        // class name because we want a specific service implementation that
-        // we know will be running in our own process (and thus won't be
-        // supporting component replacement by other applications).
-        bindService(new Intent(MainActivity.this,
-                LocalService.class), mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
-    }
-
-    void doUnbindService() {
-        if (mIsBound) {
-            // Detach our existing connection.
-            unbindService(mConnection);
-            mIsBound = false;
-        }
-    }
 
     @Override
     protected void onDestroy() {
+        Log.d("MainActivity","On destroy");
         super.onDestroy();
-        stopService(intent);
-        //doUnbindService();
     }
 
 

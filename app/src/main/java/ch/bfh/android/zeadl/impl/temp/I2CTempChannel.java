@@ -9,7 +9,7 @@ import ch.bfh.android.zeadl.SensorChannel;
 /**
  * Created by timo on 3/24/15.
  */
-public class I2CTempChannel implements SensorChannel {
+public class I2CTempChannel extends SensorChannel {
 
   /* MCP9800 Register pointers */
   private static final char MCP9800_TEMP   = 0x00;      /* Ambient Temperature Register */
