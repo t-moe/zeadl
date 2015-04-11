@@ -1,10 +1,14 @@
 package ch.bfh.android.zeadl;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,27 +24,10 @@ import java.util.List;
 import ch.bfh.android.zeadl.service.ServiceHelper;
 
 
-public class MainActivity extends ActionBarActivity implements SensorGroup.UpdateListener, SensorGroup.DataSegment.EntryAddedListener {
+public class MainActivity extends ActionBarActivity {
 
 
     private ServiceHelper serviceHelper;
-
-
-    @Override
-    public void onEntryAdded(SensorGroup.DataSegment.EntryAddedEvent event) {
-
-    }
-
-    @Override
-    public void onActiveChannelsChanged(SensorGroup.ActiveChannelsChangedEvent event) {
-
-    }
-
-    @Override
-    public void onDataSegmentAdded(SensorGroup.DataSegmentAddedEvent event) {
-        event.getDataSegment().addEventListener(this);
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,34 +38,33 @@ public class MainActivity extends ActionBarActivity implements SensorGroup.Updat
         setContentView(R.layout.activity_main);
 
         ListView list=(ListView)findViewById(R.id.mainListView);
-        LazyMainListViewAdapter adapter=new LazyMainListViewAdapter(this);
+        final LazyMainListViewAdapter adapter=new LazyMainListViewAdapter(this);
         list.setAdapter(adapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //SensorGroup group = adapter.getItem(position);
+                Intent i = new Intent(MainActivity.this,DetailActivity.class);
+                i.putExtra("sensorGroupId",position);
+                startActivity(i);
+            }
+        });
+
 
 
         //Test: Add some groups and channels
 
-        SensorGroup tempGroup;
         List<SensorGroup> activeGroups = SensorGroupController.getActiveGroups();
         if(activeGroups.size()==0) {
-            List<SensorGroupController.GroupInfo> strs = SensorGroupController.getAvailableGroups();
-            tempGroup= SensorGroupController.activate(strs.get(0));
-            tempGroup.addEventListener(this);
-        } else
-        {
-            tempGroup = activeGroups.get(0);
-        }
-        SensorGroupController.getActiveGroups();
+            List<SensorGroupController.GroupInfo> availableGroups = SensorGroupController.getAvailableGroups();
+            for(SensorGroupController.GroupInfo groupInfo: availableGroups) {
+                SensorGroup group = SensorGroupController.activate(groupInfo);
+                for(SensorGroup.ChannelInfo channelInfo : group.getAvailableChannels()) {
+                    SensorChannel channel = group.activate(channelInfo);
+                    channel.setColor(Color.argb(255,(int)Math.round(Math.random()*255f),(int)Math.round(Math.random()*255f),(int)Math.round(Math.random()*255f)));
+                }
+            }
 
-        SensorChannel ch1tmp;
-        SensorChannel ch2tmp;
-        List<SensorChannel> tempChannels = tempGroup.getActiveChannels();
-        if(tempChannels.size()==0) {
-            List<SensorGroup.ChannelInfo> avails = tempGroup.getAvailableChannels();
-            ch1tmp = tempGroup.activate(avails.get(0));
-            ch2tmp = tempGroup.activate(avails.get(1));
-        } else {
-            ch1tmp = tempChannels.get(0);
-            ch2tmp = tempChannels.get(1);
         }
 
         Log.d("MainActivity","On create");
@@ -140,10 +126,11 @@ public class MainActivity extends ActionBarActivity implements SensorGroup.Updat
             this.finish();
             return true;
         } else if (id==R.id.action_test) {
-            if(SensorGroupController.getActiveGroups().isEmpty()) {
-                SensorGroupController.activate(SensorGroupController.getAvailableGroups().get(0));
+            SensorGroupController.GroupInfo groupZero = SensorGroupController.getAvailableGroups().get(0);
+            if(!SensorGroupController.isActive(groupZero)) {
+                SensorGroupController.activate(groupZero);
             } else {
-                SensorGroupController.deactivate(SensorGroupController.getAvailableGroups().get(0));
+                SensorGroupController.deactivate(groupZero);
             }
         }
 

@@ -3,9 +3,9 @@ package ch.bfh.android.zeadl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventListener;
-import java.util.EventObject;
 import java.util.List;
 
+import ch.bfh.android.zeadl.impl.gravitydummy.GravityDummyGroup;
 import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
 
 /**
@@ -19,11 +19,12 @@ import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
  */
 public final class SensorGroupController {
 
-    private final static List<GroupInfo> _sensorGroups = new ArrayList<GroupInfo>();
-    private final static List<SensorGroup> _activeSensorGroups = new ArrayList<SensorGroup>();
+    private final static List<GroupInfo> mSensorGroups = new ArrayList<GroupInfo>();
+    private final static List<SensorGroup> mActiveSensorGroups = new ArrayList<SensorGroup>();
     static {
         //Add available sensor groups here
-        _sensorGroups.add(new GroupInfo(TempSensorGroup.class));
+        mSensorGroups.add(new GroupInfo(TempSensorGroup.class));
+        mSensorGroups.add(new GroupInfo(GravityDummyGroup.class));
 
         //TODO: Find the classes automatically using reflection
     }
@@ -82,10 +83,10 @@ public final class SensorGroupController {
      */
     public static synchronized final SensorGroup activate(GroupInfo gi) {
         SensorGroup group = gi.getInstance();
-        if(group!=null && _activeSensorGroups.contains(group)) return null;
+        if(group!=null && mActiveSensorGroups.contains(group)) return null;
         if(gi.create()) {
             group = gi.getInstance();
-            _activeSensorGroups.add(group);
+            mActiveSensorGroups.add(group);
 
             synchronized (mListeners) {
                 for (UpdateListener listener : mListeners) {
@@ -104,8 +105,8 @@ public final class SensorGroupController {
      * @return bool on success
      */
     public static synchronized final boolean deactivate(SensorGroup group) {
-        if(!_activeSensorGroups.contains(group)) return false;
-        _activeSensorGroups.remove(group);
+        if(!mActiveSensorGroups.contains(group)) return false;
+        mActiveSensorGroups.remove(group);
 
         synchronized (mListeners) {
             for (UpdateListener listener : mListeners) {
@@ -124,8 +125,8 @@ public final class SensorGroupController {
      */
     public static synchronized final boolean deactivate(GroupInfo gi) {
         SensorGroup group =gi.getInstance();
-        if(!_activeSensorGroups.contains(group)) return false;
-        _activeSensorGroups.remove(group);
+        if(!mActiveSensorGroups.contains(group)) return false;
+        mActiveSensorGroups.remove(group);
 
         synchronized (mListeners) {
             for (UpdateListener listener : mListeners) {
@@ -135,12 +136,16 @@ public final class SensorGroupController {
         return true;
     }
 
+    public static final boolean isActive(GroupInfo gi) {
+        return mActiveSensorGroups.contains(gi.getInstance());
+    }
+
     /**
      * Returns all available SensorGroups
      * @return
      */
     public static final List<GroupInfo> getAvailableGroups() {
-        return Collections.unmodifiableList(_sensorGroups);
+        return Collections.unmodifiableList(mSensorGroups);
     }
 
     /**
@@ -148,7 +153,7 @@ public final class SensorGroupController {
      * @return
      */
     public static final List<SensorGroup> getActiveGroups() {
-        return Collections.unmodifiableList(_activeSensorGroups);
+        return Collections.unmodifiableList(mActiveSensorGroups);
     }
 
 

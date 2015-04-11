@@ -46,9 +46,8 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         if(convertView==null)
             vi = inflater.inflate(R.layout.list_row, null);
 
-        TextView title = (TextView)vi.findViewById(R.id.title);
-        TextView channels = (TextView)vi.findViewById(R.id.txtChannels);
-        TextView samplerate = (TextView)vi.findViewById(R.id.txtSampleRate);
+        TextView title = (TextView)vi.findViewById(R.id.txtTitle);
+        TextView info = (TextView)vi.findViewById(R.id.txtInfo);
 
         if(getCount()==0) {
             Log.w("LazyMainListViewAdapter","Unexpected empty list");
@@ -57,13 +56,12 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         SensorGroup sensorGroup = getItem(position);
 
         title.setText(sensorGroup.getName());
-        channels.setText(sensorGroup.getActiveChannels().size()+" Channels");
-        samplerate.setText(sensorGroup.getSampleRate()+ " Samples/sec");
-
+        info.setText(sensorGroup.getSampleRate()+" Samples/sec in " +sensorGroup.getUnit());
 
         final XYMultipleSeriesDataset mDataset;
         XYMultipleSeriesRenderer mRenderer;
         LinearLayout layout = (LinearLayout) vi.findViewById(R.id.graphview);
+        layout.removeAllViews();
 
         // create dataset and renderer
         mDataset = new XYMultipleSeriesDataset();
@@ -71,8 +69,8 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
 
         //Colors
         mRenderer.setApplyBackgroundColor(true);
-        mRenderer.setBackgroundColor(Color.LTGRAY);
-        mRenderer.setMarginsColor(Color.parseColor("#fff3f3f3")); //background_holo_light
+        mRenderer.setBackgroundColor(Color.argb(0,1,1,1));
+        mRenderer.setMarginsColor(Color.argb(0,1,1,1)); //transparent
         mRenderer.setXLabelsColor(Color.DKGRAY);
         mRenderer.setYLabelsColor(0,Color.DKGRAY);
         mRenderer.setLabelsColor(Color.BLACK);
@@ -85,44 +83,35 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         mRenderer.setLegendTextSize(25);
 
         //Spacings
-        mRenderer.setMargins(new int[]{50, 80, 50, 50});
+        mRenderer.setMargins(new int[]{35, 45, 25, 30});
         mRenderer.setYLabelsAlign(Paint.Align.RIGHT, 0);
-        mRenderer.setYLabelsPadding(10);
+        mRenderer.setYLabelsPadding(15);
 
         mRenderer.setPointSize(10f);
         mRenderer.setClickEnabled(false);
         //mRenderer.setSelectableBuffer(30);
-        mRenderer.setPanEnabled(true,true);
-        mRenderer.setZoomEnabled(true, true);
+        mRenderer.setPanEnabled(false,false);
+        mRenderer.setZoomEnabled(false, false);
         mRenderer.setShowGridY(true);
 
 
-        XYSeriesRenderer ch1Renderer = new XYSeriesRenderer();
-        ch1Renderer.setColor(Color.BLUE);
-        ch1Renderer.setPointStyle(PointStyle.CIRCLE);
-        ch1Renderer.setFillPoints(true);
-        ch1Renderer.setLineWidth(3f);
-        ch1Renderer.setDisplayChartValues(true);
-        ch1Renderer.setDisplayChartValuesDistance(100);
-        ch1Renderer.setChartValuesTextSize(20);
-        ch1Renderer.setChartValuesFormat(NumberFormat.getInstance());
-        ch1Renderer.setChartValuesSpacing(20);
-
-
-        mRenderer.addSeriesRenderer(ch1Renderer);
-        XYSeriesRenderer ch2Renderer = new XYSeriesRenderer();
-        ch2Renderer.setColor(Color.RED);
-        ch2Renderer.setPointStyle(PointStyle.CIRCLE);
-        ch2Renderer.setFillPoints(true);
-        ch2Renderer.setLineWidth(3f);
-        mRenderer.addSeriesRenderer(ch2Renderer);
-
-
-        //mRenderer.setChartTitle(tempGroup.getName());
 
         final SensorGroup.DataSegment dataSegment = sensorGroup.getLastDataSegment();
         int chInd=0;
         for(SensorChannel channel : dataSegment.getChannels()) {
+
+            XYSeriesRenderer chRenderer = new XYSeriesRenderer();
+            chRenderer.setColor(channel.getColor());
+            chRenderer.setPointStyle(PointStyle.CIRCLE);
+            chRenderer.setFillPoints(true);
+            chRenderer.setLineWidth(3f);
+            chRenderer.setDisplayChartValues(true);
+            chRenderer.setDisplayChartValuesDistance(100);
+            chRenderer.setChartValuesTextSize(20);
+            chRenderer.setChartValuesFormat(NumberFormat.getInstance());
+            chRenderer.setChartValuesSpacing(20);
+            mRenderer.addSeriesRenderer(chRenderer);
+
             TimeSeries channelSeries = new TimeSeries(channel.getName());
 
             for (SensorGroup.DataSegment.Entry entry:dataSegment.getEntries() ) {
@@ -132,10 +121,6 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
             mDataset.addSeries(channelSeries);
             chInd++;
         }
-
-
-        mRenderer.setXTitle("time");
-        mRenderer.setYTitle(sensorGroup.getUnit());
 
 
         final GraphicalView mChartView = ChartFactory.getTimeChartView(activity, mDataset, mRenderer,

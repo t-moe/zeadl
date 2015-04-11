@@ -11,7 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-       /* ndk {
+        /* ndk {
             moduleName "i2c"
         }*/
     }
@@ -35,8 +35,9 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
     compile group: 'org.achartengine', name: 'achartengine', version: '1.2.0'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
 }
 
 repositories {
@@ -60,5 +61,6 @@ task ndkBuild(type: Exec) {
 tasks.withType(JavaCompile) {
     compileTask -> compileTask.dependsOn ndkBuild
 }*/
+
 
 
