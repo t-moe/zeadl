@@ -1,8 +1,8 @@
-package ch.bfh.android.zeadl.impl.gravitydummy;
+package ch.bfh.android.zeadl.sensor.impl.gravitydummy;
 
-import ch.bfh.android.zeadl.DisplayName;
-import ch.bfh.android.zeadl.SensorGroup;
-import ch.bfh.android.zeadl.impl.RandomChannel;
+import ch.bfh.android.zeadl.sensor.DisplayName;
+import ch.bfh.android.zeadl.sensor.SensorGroup;
+import ch.bfh.android.zeadl.sensor.impl.RandomChannel;
 
 /**
  * Created by timo on 4/11/15.

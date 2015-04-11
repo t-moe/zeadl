@@ -1,8 +1,8 @@
-package ch.bfh.android.zeadl.impl;
+package ch.bfh.android.zeadl.sensor.impl;
 
 import java.util.Random;
 
-import ch.bfh.android.zeadl.SensorChannel;
+import ch.bfh.android.zeadl.sensor.SensorChannel;
 
 /**
  * Created by timo on 4/4/15.

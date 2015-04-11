@@ -1,7 +1,6 @@
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,18 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import org.achartengine.GraphicalView;
-import org.achartengine.model.TimeSeries;
-import org.achartengine.model.XYMultipleSeriesDataset;
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-
-import java.util.Date;
-import java.util.List;
-
+import ch.bfh.android.zeadl.R;
 import ch.bfh.android.zeadl.service.ServiceHelper;
 
 
@@ -38,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         ListView list=(ListView)findViewById(R.id.mainListView);
-        final LazyMainListViewAdapter adapter=new LazyMainListViewAdapter(this);
+        final MainListViewAdapter adapter=new MainListViewAdapter(this);
         list.setAdapter(adapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -49,23 +39,6 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(i);
             }
         });
-
-
-
-        //Test: Add some groups and channels
-
-        List<SensorGroup> activeGroups = SensorGroupController.getActiveGroups();
-        if(activeGroups.size()==0) {
-            List<SensorGroupController.GroupInfo> availableGroups = SensorGroupController.getAvailableGroups();
-            for(SensorGroupController.GroupInfo groupInfo: availableGroups) {
-                SensorGroup group = SensorGroupController.activate(groupInfo);
-                for(SensorGroup.ChannelInfo channelInfo : group.getAvailableChannels()) {
-                    SensorChannel channel = group.activate(channelInfo);
-                    channel.setColor(Color.argb(255,(int)Math.round(Math.random()*255f),(int)Math.round(Math.random()*255f),(int)Math.round(Math.random()*255f)));
-                }
-            }
-
-        }
 
         Log.d("MainActivity","On create");
     }
@@ -120,20 +93,15 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_exit) {
-            serviceHelper.Stop();
-            this.finish();
-            return true;
-        } else if (id==R.id.action_test) {
-            SensorGroupController.GroupInfo groupZero = SensorGroupController.getAvailableGroups().get(0);
-            if(!SensorGroupController.isActive(groupZero)) {
-                SensorGroupController.activate(groupZero);
-            } else {
-                SensorGroupController.deactivate(groupZero);
-            }
+        switch(id) {
+            case R.id.action_exit:
+                serviceHelper.Stop();
+                this.finish();
+                return true;
+            case R.id.action_groups:
+                startActivity(new Intent(this,GroupSelectActivity.class));
+                break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

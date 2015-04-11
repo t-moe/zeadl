@@ -10,7 +10,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import ch.bfh.android.zeadl.MainActivity;
+import ch.bfh.android.zeadl.activity.MainActivity;
 import ch.bfh.android.zeadl.R;
 
 public class LocalService extends Service {

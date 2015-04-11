@@ -1,12 +1,12 @@
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.sensor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
-import ch.bfh.android.zeadl.impl.gravitydummy.GravityDummyGroup;
-import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
+import ch.bfh.android.zeadl.sensor.impl.gravitydummy.GravityDummyGroup;
+import ch.bfh.android.zeadl.sensor.impl.temp.TempSensorGroup;
 
 /**
  * Created by timo on 4/4/15.

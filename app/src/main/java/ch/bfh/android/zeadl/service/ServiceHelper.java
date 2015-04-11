@@ -1,15 +1,10 @@
 package ch.bfh.android.zeadl.service;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.widget.Toast;
-
-import ch.bfh.android.zeadl.MainActivity;
-import ch.bfh.android.zeadl.R;
 
 /**
  * Created by timo on 4/10/15.

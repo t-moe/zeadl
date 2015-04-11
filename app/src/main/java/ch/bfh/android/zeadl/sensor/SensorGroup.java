@@ -1,4 +1,4 @@
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.sensor;
 
 import java.util.ArrayList;
 import java.util.Collections;

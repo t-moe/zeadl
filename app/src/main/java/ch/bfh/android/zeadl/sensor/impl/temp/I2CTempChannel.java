@@ -1,10 +1,9 @@
-package ch.bfh.android.zeadl.impl.temp;
+package ch.bfh.android.zeadl.sensor.impl.temp;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import ch.bfh.android.zeadl.I2C;
-import ch.bfh.android.zeadl.SensorChannel;
+import ch.bfh.android.zeadl.sensor.I2C;
+import ch.bfh.android.zeadl.sensor.SensorChannel;
 
 /**
  * Created by timo on 3/24/15.

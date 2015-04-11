@@ -1,4 +1,4 @@
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.activity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,26 +25,29 @@ import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Handler;
+
+import ch.bfh.android.zeadl.R;
+import ch.bfh.android.zeadl.sensor.SensorChannel;
+import ch.bfh.android.zeadl.sensor.SensorGroup;
+import ch.bfh.android.zeadl.sensor.SensorGroupController;
 
 /**
  * Created by timo on 4/11/15.
  */
-public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implements SensorGroupController.UpdateListener {
+public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements SensorGroupController.UpdateListener {
     private Activity activity;
     private LayoutInflater inflater=null;
-    private List lis;
 
-    public LazyMainListViewAdapter(Activity a) {
-        super(a,R.layout.list_row, SensorGroupController.getActiveGroups());
-        lis= SensorGroupController.getActiveGroups();
+    private final int limit_labels_visible = 50;
+    private final int limit_datasize = 300;
+
+    public MainListViewAdapter(Activity a) {
+        super(a, R.layout.main_list_row, SensorGroupController.getActiveGroups());
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         SensorGroupController.addEventListener(this);
     }
-
 
     public static int dpToPx(float dp)
     {
@@ -54,7 +57,7 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi=convertView;
         if(convertView==null)
-            vi = inflater.inflate(R.layout.list_row, null);
+            vi = inflater.inflate(R.layout.main_list_row, null);
 
         TextView title = (TextView)vi.findViewById(R.id.txtTitle);
         TextView info = (TextView)vi.findViewById(R.id.txtInfo);
@@ -86,14 +89,10 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         mRenderer.setGridColor(Color.GRAY);
 
         //TextSizes
-       // mRenderer.setAxisTitleTextSize(21);
-       // mRenderer.setChartTitleTextSize(30);
-        mRenderer.setLabelsTextSize(dpToPx(8)); //
+        mRenderer.setLabelsTextSize(dpToPx(8));
         mRenderer.setLegendTextSize(dpToPx(8));
 
         //Spacings
-
-
         float density = Resources.getSystem().getDisplayMetrics().density;
 
         int marginBottom = dpToPx(8);
@@ -107,7 +106,6 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
 
         mRenderer.setPointSize(dpToPx(3));
         mRenderer.setClickEnabled(false);
-        //mRenderer.setSelectableBuffer(30);
         mRenderer.setPanEnabled(false,false);
         mRenderer.setZoomEnabled(false, false);
         mRenderer.setShowGridY(true);
@@ -137,7 +135,7 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
                 channelSeries.add(entry.getTime(),entry.getChannelData().get(chInd));
             }
 
-            if(entries.size()>=50) {
+            if(entries.size()>=limit_labels_visible) {
                 mRenderer.setPointSize(0);
                 chRenderer.setDisplayChartValues(false);
             }
@@ -155,8 +153,8 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
             public void onEntryAdded(SensorGroup.DataSegment.EntryAddedEvent event) {
                 SensorGroup.DataSegment.Entry entry = event.getEntry();
 
-                //Check if we have exactly 50 visible data points
-                if(((SensorGroup.DataSegment)event.getSource()).getEntries().size()==50) {
+                //Check if we have exactly limit_labels_visible visible data points
+                if(((SensorGroup.DataSegment)event.getSource()).getEntries().size()==limit_labels_visible) {
                     //Sadly we can not set the point size to 0 here without creating a new Graph.
                     //This is because the TimeChart uses a ScatterChart which has a private size member which is initialized in the ctor.
                     //So we use reflection to hack our way into the class
@@ -175,6 +173,11 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
 
                 for(int chInd=0; chInd<dataSegment.getChannels().size();chInd++) {
                     TimeSeries channelSeries = (TimeSeries)mDataset.getSeries()[chInd];
+
+                    while(channelSeries.getItemCount() > limit_datasize) {
+                        channelSeries.remove(0);
+                    }
+
                     channelSeries.add(entry.getTime(),entry.getChannelData().get(chInd));
                 }
 

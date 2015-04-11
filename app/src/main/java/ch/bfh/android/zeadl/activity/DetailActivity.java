@@ -1,10 +1,12 @@
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.activity;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
+
+import ch.bfh.android.zeadl.R;
+import ch.bfh.android.zeadl.sensor.SensorGroup;
+import ch.bfh.android.zeadl.sensor.SensorGroupController;
 
 
 public class DetailActivity extends ActionBarActivity {

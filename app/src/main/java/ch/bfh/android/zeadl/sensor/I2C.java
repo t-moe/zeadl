@@ -14,7 +14,7 @@
  ***************************************************************************
  */
 
-package ch.bfh.android.zeadl;
+package ch.bfh.android.zeadl.sensor;
 
 import java.io.IOException;
 

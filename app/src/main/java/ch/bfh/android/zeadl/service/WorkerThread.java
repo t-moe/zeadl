@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ch.bfh.android.zeadl.SensorChannel;
-import ch.bfh.android.zeadl.SensorGroup;
-import ch.bfh.android.zeadl.SensorGroupController;
+import ch.bfh.android.zeadl.sensor.SensorChannel;
+import ch.bfh.android.zeadl.sensor.SensorGroup;
+import ch.bfh.android.zeadl.sensor.SensorGroupController;
 
 /**
  * Created by timo on 4/10/15.
