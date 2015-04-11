@@ -1,5 +1,6 @@
 package ch.bfh.android.zeadl;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.app.ActionBarActivity;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.lang.reflect.Array;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
@@ -79,6 +82,29 @@ public class MainActivity extends ActionBarActivity {
 
 
         layout = (LinearLayout) findViewById(R.id.chart);
+/*
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, DetailActivity.class));
+            }
+        });
+//*/
+        int[] data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final DataClass DatenKlasse = new DataClass("TestDaten",0,10,data);
+
+        Button Buttentest = (Button) findViewById(R.id.mainbutten);
+
+        Buttentest.setText(DatenKlasse.getTitle());
+
+  //*
+        Buttentest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, DetailActivity.class));
+            }
+        });
+  //*/
 
         // create dataset and renderer
         mDataset = new XYMultipleSeriesDataset();
@@ -122,9 +148,8 @@ public class MainActivity extends ActionBarActivity {
         ch1Renderer.setChartValuesTextSize(20);
         ch1Renderer.setChartValuesFormat(NumberFormat.getInstance());
         ch1Renderer.setChartValuesSpacing(20);
-
-
         mRenderer.addSeriesRenderer(ch1Renderer);
+
         XYSeriesRenderer ch2Renderer = new XYSeriesRenderer();
         ch2Renderer.setColor(Color.RED);
         ch2Renderer.setPointStyle(PointStyle.CIRCLE);
