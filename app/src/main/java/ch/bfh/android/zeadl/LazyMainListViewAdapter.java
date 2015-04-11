@@ -16,11 +16,14 @@ import android.widget.TextView;
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.chart.ScatterChart;
+import org.achartengine.chart.TimeChart;
 import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.List;
@@ -65,14 +68,13 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         title.setText(sensorGroup.getName());
         info.setText(sensorGroup.getSampleRate()+" Samples/sec in " +sensorGroup.getUnit());
 
-        final XYMultipleSeriesDataset mDataset;
-        XYMultipleSeriesRenderer mRenderer;
-        LinearLayout layout = (LinearLayout) vi.findViewById(R.id.graphview);
+
+        final LinearLayout layout = (LinearLayout) vi.findViewById(R.id.graphview);
         layout.removeAllViews();
 
         // create dataset and renderer
-        mDataset = new XYMultipleSeriesDataset();
-        mRenderer = new XYMultipleSeriesRenderer();
+        final XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
+        final XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 
         //Colors
         mRenderer.setApplyBackgroundColor(true);
@@ -129,9 +131,15 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
             mRenderer.addSeriesRenderer(chRenderer);
 
             TimeSeries channelSeries = new TimeSeries(channel.getName());
+            List<SensorGroup.DataSegment.Entry> entries = dataSegment.getEntries();
 
-            for (SensorGroup.DataSegment.Entry entry:dataSegment.getEntries() ) {
+            for (SensorGroup.DataSegment.Entry entry:entries ) {
                 channelSeries.add(entry.getTime(),entry.getChannelData().get(chInd));
+            }
+
+            if(entries.size()>=50) {
+                mRenderer.setPointSize(0);
+                chRenderer.setDisplayChartValues(false);
             }
 
             mDataset.addSeries(channelSeries);
@@ -142,11 +150,28 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         final GraphicalView mChartView = ChartFactory.getTimeChartView(activity, mDataset, mRenderer,
                 "H:mm:ss");
 
-
         dataSegment.addEventListener(new SensorGroup.DataSegment.EntryAddedListener() {
             @Override
             public void onEntryAdded(SensorGroup.DataSegment.EntryAddedEvent event) {
                 SensorGroup.DataSegment.Entry entry = event.getEntry();
+
+                //Check if we have exactly 50 visible data points
+                if(((SensorGroup.DataSegment)event.getSource()).getEntries().size()==50) {
+                    //Sadly we can not set the point size to 0 here without creating a new Graph.
+                    //This is because the TimeChart uses a ScatterChart which has a private size member which is initialized in the ctor.
+                    //So we use reflection to hack our way into the class
+                    try {
+                        Field f = ScatterChart.class.getDeclaredField("size");
+                        f.setAccessible(true);
+                        f.setInt(((TimeChart) mChartView.getChart()).getPointsChart(),0);
+                    } catch (Exception e){
+                        //no access :(
+                    }
+
+                    for(int chInd=0; chInd<dataSegment.getChannels().size();chInd++) {
+                        ((XYSeriesRenderer) mRenderer.getSeriesRendererAt(chInd)).setDisplayChartValues(false);
+                    }
+                }
 
                 for(int chInd=0; chInd<dataSegment.getChannels().size();chInd++) {
                     TimeSeries channelSeries = (TimeSeries)mDataset.getSeries()[chInd];
