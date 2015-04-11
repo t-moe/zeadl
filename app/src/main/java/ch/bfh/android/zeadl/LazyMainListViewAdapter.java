@@ -2,6 +2,7 @@ package ch.bfh.android.zeadl;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
@@ -41,6 +42,12 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         SensorGroupController.addEventListener(this);
     }
 
+
+    public static int dpToPx(float dp)
+    {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi=convertView;
         if(convertView==null)
@@ -77,17 +84,26 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
         mRenderer.setGridColor(Color.GRAY);
 
         //TextSizes
-        mRenderer.setAxisTitleTextSize(21);
-        mRenderer.setChartTitleTextSize(30);
-        mRenderer.setLabelsTextSize(25);
-        mRenderer.setLegendTextSize(25);
+       // mRenderer.setAxisTitleTextSize(21);
+       // mRenderer.setChartTitleTextSize(30);
+        mRenderer.setLabelsTextSize(dpToPx(8)); //
+        mRenderer.setLegendTextSize(dpToPx(8));
 
         //Spacings
-        mRenderer.setMargins(new int[]{35, 45, 25, 30});
-        mRenderer.setYLabelsAlign(Paint.Align.RIGHT, 0);
-        mRenderer.setYLabelsPadding(15);
 
-        mRenderer.setPointSize(10f);
+
+        float density = Resources.getSystem().getDisplayMetrics().density;
+
+        int marginBottom = dpToPx(8);
+        if(density<=1.5) { //beagle bone
+            mRenderer.setLegendHeight(dpToPx(27));
+            marginBottom= dpToPx(-3);
+        }
+        mRenderer.setMargins(new int[]{dpToPx(12), dpToPx(18), marginBottom, dpToPx(6)});
+        mRenderer.setYLabelsAlign(Paint.Align.RIGHT, 0);
+        mRenderer.setYLabelsPadding(dpToPx(5));
+
+        mRenderer.setPointSize(dpToPx(3));
         mRenderer.setClickEnabled(false);
         //mRenderer.setSelectableBuffer(30);
         mRenderer.setPanEnabled(false,false);
@@ -104,12 +120,12 @@ public class LazyMainListViewAdapter extends ArrayAdapter<SensorGroup> implement
             chRenderer.setColor(channel.getColor());
             chRenderer.setPointStyle(PointStyle.CIRCLE);
             chRenderer.setFillPoints(true);
-            chRenderer.setLineWidth(3f);
+            chRenderer.setLineWidth(dpToPx(2));
             chRenderer.setDisplayChartValues(true);
-            chRenderer.setDisplayChartValuesDistance(100);
-            chRenderer.setChartValuesTextSize(20);
+            chRenderer.setDisplayChartValuesDistance(dpToPx(30));
+            chRenderer.setChartValuesTextSize(dpToPx(8));
             chRenderer.setChartValuesFormat(NumberFormat.getInstance());
-            chRenderer.setChartValuesSpacing(20);
+            chRenderer.setChartValuesSpacing(dpToPx(5));
             mRenderer.addSeriesRenderer(chRenderer);
 
             TimeSeries channelSeries = new TimeSeries(channel.getName());
