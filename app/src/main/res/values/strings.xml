@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Zeadl</string>
-
     <string name="action_groups">Select Groups</string>
     <string name="action_exit">Exit</string>
     <string name="local_service_started">Recording Data...</string>
@@ -10,4 +9,5 @@
     <string name="local_service_label">Zeadle Service</string>
     <string name="title_activity_detail">Details</string>
     <string name="title_activity_group_select">Select Groups</string>
+    <string name="action_settings">Settings</string>
 </resources>

@@ -6,7 +6,261 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="ch.bfh.android.zeadl.activity.DetailActivity">
 
-    <TextView android:text="Test" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:id="@+id/testtext"/>
+    <TabHost
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/tabHost"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></TabWidget>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <LinearLayout
+                    android:id="@+id/tabGraph"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:id="@+id/layoutChart"></LinearLayout>
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Save Graph"
+                            android:id="@+id/buttonSaveGraph"
+                            android:layout_gravity="right"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tabTable"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:nestedScrollingEnabled="false"
+                        android:id="@+id/TableData"
+                        android:padding="5dp">
+
+                        <TableRow
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/labelTime"
+                                android:text="Time  "
+                                />
+                            <TextView
+                                android:id="@+id/labelChannel1"
+                                android:text="Channel 1  "
+                                />
+                            <TextView
+                                android:id="@+id/labelChannel2"
+                                android:text="Channel 2  "
+                                />
+                        </TableRow>
+                    </TableLayout>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="New Button"
+                        android:id="@+id/button"
+                        android:layout_column="12"
+                        android:layout_gravity="right" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tabSettings"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+
+                        <RelativeLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="45dp">
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="fill_parent"
+                                android:weightSum="1"
+                                android:layout_gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?android:attr/textAppearanceMedium"
+                                    android:text="Samplerate"
+                                    android:id="@+id/IndicatorSamplerate"
+                                    android:layout_gravity="center_vertical" />
+
+                                <SeekBar
+                                    android:layout_width="315dp"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/barSamplerate"
+                                    android:layout_weight="0.31"
+                                    android:layout_gravity="center_vertical"
+                                    android:max="1000" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="?android:attr/textAppearanceMedium"
+                                    android:text="Medium Text"
+                                    android:id="@+id/textSamplerate"
+                                    android:layout_gravity="center_vertical" />
+                            </LinearLayout>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="35dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignRight="@+id/buttonClearGraph"
+                            android:layout_alignEnd="@+id/buttonClearGraph">
+
+                            <CheckBox
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Channel 1"
+                                android:id="@+id/checkBoxChannel1"
+                                android:checked="false"
+                                android:layout_marginLeft="30dp"
+                                android:layout_marginStart="30dp"
+                                android:layout_alignTop="@+id/imageView"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/imageView"
+                                android:minHeight="25dp"
+                                android:minWidth="25dp"
+                                android:nestedScrollingEnabled="true"
+                                android:background="#ffff0001"
+                                android:cropToPadding="false"
+                                android:clickable="true"
+                                android:baselineAlignBottom="false"
+                                android:focusable="false"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="75dp"
+                                android:layout_marginStart="75dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toRightOf="@+id/checkBoxChannel1"
+                                android:layout_toEndOf="@+id/checkBoxChannel1" />
+
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:layout_below="@+id/checkBoxChannel1"
+                                android:layout_toRightOf="@+id/imageView"
+                                android:layout_toEndOf="@+id/imageView"></LinearLayout>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp">
+
+                            <CheckBox
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Channel 2"
+                                android:id="@+id/CheckboxChannel2"
+                                android:checked="false"
+                                android:layout_marginLeft="30dp"
+                                android:layout_marginStart="30dp"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/imageView2"
+                                android:minHeight="25dp"
+                                android:minWidth="25dp"
+                                android:nestedScrollingEnabled="true"
+                                android:background="#ff00ff00"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="75dp"
+                                android:layout_marginStart="75dp"
+                                android:layout_centerVertical="true"
+                                android:layout_toRightOf="@+id/CheckboxChannel2"
+                                android:layout_toEndOf="@+id/CheckboxChannel2" />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Clear Graph"
+                                android:id="@+id/buttonClearGraph"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true" />
+
+                            <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Back"
+                                android:id="@+id/buttonBack"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_gravity="left" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
 </RelativeLayout>
