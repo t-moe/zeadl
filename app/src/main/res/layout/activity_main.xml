@@ -1,26 +1,27 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    android:orientation="vertical">
 
-    <TextView
+    <!--<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Small Text"
         android:id="@+id/tempText"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true" />-->
 
-    <LinearLayout
+    <!--<LinearLayout
         android:id="@+id/chart"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/tempText"
-        android:layout_centerHorizontal="true"></LinearLayout>
+        android:layout_centerHorizontal="true"></LinearLayout>-->
 
     <!---<com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
@@ -32,4 +33,8 @@
         android:layout_height="200dip"
         android:id="@+id/graph" />-->
 
-</RelativeLayout>
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/mainListView" />
+</LinearLayout>

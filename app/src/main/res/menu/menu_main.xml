@@ -5,4 +5,7 @@
         android:orderInCategory="1000" app:showAsAction="never" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_test" android:title="Test Toggle Group"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

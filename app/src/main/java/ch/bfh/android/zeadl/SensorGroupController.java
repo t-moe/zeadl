@@ -2,6 +2,8 @@ package ch.bfh.android.zeadl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EventListener;
+import java.util.EventObject;
 import java.util.List;
 
 import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
@@ -15,7 +17,7 @@ import ch.bfh.android.zeadl.impl.temp.TempSensorGroup;
  * Static class which provides access to all available and active sensor groups.
  * You can activate/deactivate/query all Sensor Groups with this Class
  */
-public final class SensorGroupFactory {
+public final class SensorGroupController {
 
     private final static List<GroupInfo> _sensorGroups = new ArrayList<GroupInfo>();
     private final static List<SensorGroup> _activeSensorGroups = new ArrayList<SensorGroup>();
@@ -79,10 +81,19 @@ public final class SensorGroupFactory {
      * @return The instance of the activated SensorGroup or null on error
      */
     public static synchronized final SensorGroup activate(GroupInfo gi) {
-        if(gi.getInstance()!=null && _activeSensorGroups.contains(gi.getInstance())) return null;
+        SensorGroup group = gi.getInstance();
+        if(group!=null && _activeSensorGroups.contains(group)) return null;
         if(gi.create()) {
-            _activeSensorGroups.add(gi.getInstance());
-            return gi.getInstance();
+            group = gi.getInstance();
+            _activeSensorGroups.add(group);
+
+            synchronized (mListeners) {
+                for (UpdateListener listener : mListeners) {
+                    listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_ACTIVATED, group));
+                }
+            }
+
+            return group;
         }
         return null;
     }
@@ -95,6 +106,14 @@ public final class SensorGroupFactory {
     public static synchronized final boolean deactivate(SensorGroup group) {
         if(!_activeSensorGroups.contains(group)) return false;
         _activeSensorGroups.remove(group);
+
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_DEACTIVATED, group));
+            }
+        }
+
+
         return true;
     }
 
@@ -104,8 +123,15 @@ public final class SensorGroupFactory {
      * @return bool on success
      */
     public static synchronized final boolean deactivate(GroupInfo gi) {
-        if(!_activeSensorGroups.contains(gi.getInstance())) return false;
-        _activeSensorGroups.remove(gi.getInstance());
+        SensorGroup group =gi.getInstance();
+        if(!_activeSensorGroups.contains(group)) return false;
+        _activeSensorGroups.remove(group);
+
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_DEACTIVATED, group));
+            }
+        }
         return true;
     }
 
@@ -124,4 +150,45 @@ public final class SensorGroupFactory {
     public static final List<SensorGroup> getActiveGroups() {
         return Collections.unmodifiableList(_activeSensorGroups);
     }
+
+
+
+    public static class ActiveGroupsChangedEvent {
+        public enum Type {
+            GROUP_ACTIVATED,
+            GROUP_DEACTIVATED,
+        }
+        private Type mType;
+        private SensorGroup mGroup;
+        private ActiveGroupsChangedEvent(final Object source, final Type type, final SensorGroup group) {
+            mGroup=group;
+            mType=type;
+        }
+        public final Type getType() {
+            return mType;
+        }
+        public final SensorGroup getGroup () {
+            return mGroup;
+        }
+    }
+
+
+    public interface UpdateListener extends EventListener {
+        public void onActiveGroupsChanged(final ActiveGroupsChangedEvent event);
+    }
+
+    private static final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
+    public static synchronized void addEventListener(UpdateListener listener)  {
+        synchronized (mListeners) {
+            mListeners.add(listener);
+        }
+    }
+    public static synchronized void removeEventListener(UpdateListener listener)   {
+        synchronized (mListeners) {
+            mListeners.remove(listener);
+        }
+    }
+
+
+
 }

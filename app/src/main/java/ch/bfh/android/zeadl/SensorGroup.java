@@ -1,7 +1,5 @@
 package ch.bfh.android.zeadl;
 
-import android.provider.ContactsContract;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -232,7 +230,7 @@ public abstract class SensorGroup {
         mActiveSensorChannels.add(ci.getInstance());
         synchronized (mListeners) {
             for (UpdateListener listener : mListeners) {
-                listener.onActiveChannelsChanged(new ActiveChannelModificationEvent(this, ActiveChannelModificationEvent.Type.CHANNEL_ACTIVATED, channel));
+                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(this, ActiveChannelsChangedEvent.Type.CHANNEL_ACTIVATED, channel));
             }
         }
 
@@ -263,7 +261,7 @@ public abstract class SensorGroup {
         mActiveSensorChannels.remove(channel);
         synchronized (mListeners) {
             for (UpdateListener listener : mListeners) {
-                listener.onActiveChannelsChanged(new ActiveChannelModificationEvent(this,ActiveChannelModificationEvent.Type.CHANNEL_DEACTIVATED, channel));
+                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(this, ActiveChannelsChangedEvent.Type.CHANNEL_DEACTIVATED, channel));
             }
         }
 
@@ -292,7 +290,7 @@ public abstract class SensorGroup {
         mActiveSensorChannels.remove(ch);
         synchronized (mListeners) {
             for (UpdateListener listener : mListeners) {
-                listener.onActiveChannelsChanged(new ActiveChannelModificationEvent(this,ActiveChannelModificationEvent.Type.CHANNEL_DEACTIVATED, ch));
+                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(this, ActiveChannelsChangedEvent.Type.CHANNEL_DEACTIVATED, ch));
             }
         }
         synchronized (mDataSegments) {
@@ -332,14 +330,14 @@ public abstract class SensorGroup {
 
 
 
-    public static class ActiveChannelModificationEvent extends EventObject {
+    public static class ActiveChannelsChangedEvent extends EventObject {
         public enum Type {
             CHANNEL_ACTIVATED,
             CHANNEL_DEACTIVATED,
         }
         private Type mType;
         private SensorChannel mChannel;
-        private ActiveChannelModificationEvent(final Object source, final Type type, final SensorChannel channel) {
+        private ActiveChannelsChangedEvent(final Object source, final Type type, final SensorChannel channel) {
             super(source);
             mChannel=channel;
             mType=type;
@@ -364,7 +362,7 @@ public abstract class SensorGroup {
     }
 
     public interface UpdateListener extends EventListener {
-        public void onActiveChannelsChanged(final ActiveChannelModificationEvent event);
+        public void onActiveChannelsChanged(final ActiveChannelsChangedEvent event);
         public void onDataSegmentAdded(final DataSegmentAddedEvent event);
     }
 
