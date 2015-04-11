@@ -17,8 +17,10 @@ public class TempSensorGroup  extends SensorGroup {
         if(!Build.FINGERPRINT.startsWith("generic")) { //not in emulator
            // addChannel(new I2CTempChannel());
         }
-        addChannel(new RandomChannel("Ambient Temp (Rand)",10,30));
-        addChannel(new RandomChannel("Inner Temp (Rand)",20,25));
+        //addChannel(new RandomChannel("Ambient Temp (Rand)",10,30));
+        //addChannel(new RandomChannel("Inner Temp (Rand)",20,25));
+        addChannel(new I2CTempChannel());
+
     }
 
     @Override

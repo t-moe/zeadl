@@ -12,14 +12,15 @@ import ch.bfh.android.zeadl.sensor.impl.RandomChannel;
 public class GravityDummyGroup extends SensorGroup {
     public GravityDummyGroup() {
         setSampleRate(getMaximalSampleRate());
-        addChannel(new RandomChannel("X",0,10));
-        addChannel(new RandomChannel("Y",0,10));
-        addChannel(new RandomChannel("Z",9,10));
+        addChannel(new I2CGSensChannelX());
+        addChannel(new I2CGSensChannelY());
+        addChannel(new I2CGSensChannelZ());
     }
 
     @Override
     public String getUnit() {
-        return "m/s²";
+        return "G";
+        //return "m/s²";
     }
 
     @Override
