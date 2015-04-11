@@ -26,6 +26,13 @@ public abstract class SensorGroup {
 
     private int mSampleRate=10;
 
+
+    protected  SensorGroup() {
+        if(mSampleRate>getMaximalSampleRate()) {
+            mSampleRate = getMaximalSampleRate();
+        }
+    }
+
     /**
      * Returns the current configured sample Rate
      * @return
@@ -42,7 +49,14 @@ public abstract class SensorGroup {
         if(rate<=0 || rate > getMaximalSampleRate()) {
             throw new IllegalArgumentException();
         }
+        if(rate==mSampleRate) return;
+        int oldSampleRate = mSampleRate;
         mSampleRate = rate;
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onSampleRateChanged(new SampleRateChangedEvent(this,oldSampleRate,mSampleRate));
+            }
+        }
     }
 
 
@@ -361,9 +375,27 @@ public abstract class SensorGroup {
         }
     }
 
+
+    public static class SampleRateChangedEvent extends EventObject {
+        private int mOldSampleRate;
+        private int mNewSampleRate;
+        private SampleRateChangedEvent(final Object source, final int oldSampleRate, final int newSampleRate) {
+            super(source);
+            mOldSampleRate=oldSampleRate;
+            mNewSampleRate=newSampleRate;
+        }
+        public final int getOldSampleRate() {
+            return mOldSampleRate;
+        }
+        public final int getNewSampleRate() {
+            return mNewSampleRate;
+        }
+    }
+
     public interface UpdateListener extends EventListener {
         public void onActiveChannelsChanged(final ActiveChannelsChangedEvent event);
         public void onDataSegmentAdded(final DataSegmentAddedEvent event);
+        public void onSampleRateChanged(final SampleRateChangedEvent event);
     }
 
     private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();

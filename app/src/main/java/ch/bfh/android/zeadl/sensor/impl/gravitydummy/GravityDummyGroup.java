@@ -25,6 +25,6 @@ public class GravityDummyGroup extends SensorGroup {
 
     @Override
     public int getMaximalSampleRate() {
-        return 314;
+        return 2;
     }
 }

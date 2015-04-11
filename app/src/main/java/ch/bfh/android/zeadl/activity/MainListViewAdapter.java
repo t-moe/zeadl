@@ -131,7 +131,10 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
             TimeSeries channelSeries = new TimeSeries(channel.getName());
             List<SensorGroup.DataSegment.Entry> entries = dataSegment.getEntries();
 
-            for (SensorGroup.DataSegment.Entry entry:entries ) {
+            int startInd = (entries.size()>limit_datasize) ? (entries.size()-limit_datasize): 0;
+
+            for (int i=startInd; i<entries.size(); i++ ) {
+                SensorGroup.DataSegment.Entry entry = entries.get(i);
                 channelSeries.add(entry.getTime(),entry.getChannelData().get(chInd));
             }
 
