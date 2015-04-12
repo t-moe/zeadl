@@ -142,6 +142,11 @@ public final class SensorGroupController {
         return true;
     }
 
+    /**
+     * Returns whether or not the given SensorGroup is active
+     * @param gi The GroupInfo object retrived from getAvailableGroups()
+     * @return true if the SensorGroup is active
+     */
     public static final boolean isActive(GroupInfo gi) {
         return mActiveSensorGroups.contains(gi.getInstance());
     }

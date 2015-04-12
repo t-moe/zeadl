@@ -231,6 +231,15 @@ public abstract class SensorGroup {
         return Collections.unmodifiableList(mActiveSensorChannels);
     }
 
+    /**
+     * Returns whether or not the given SensorGroup is active
+     * @param ci The ChannelInfo object retrived from getAvailableChannel()
+     * @return true if the SensorChannel is active
+     */
+    public final boolean isActive(ChannelInfo ci) {
+        return mActiveSensorChannels.contains(ci.getInstance());
+    }
+
 
     /**
      * Activates a Sensor Channel.
@@ -336,7 +345,9 @@ public abstract class SensorGroup {
         public final String getName() {
             return mInstance.getName();
         }
-        private SensorChannel getInstance() {
+
+        //This method should probably be private..
+        public SensorChannel getInstance() {
             return mInstance;
         }
         private SensorChannel mInstance;
@@ -392,10 +403,27 @@ public abstract class SensorGroup {
         }
     }
 
+    /*public static class ColorChangedEvent extends EventObject {
+        private int mOldColor;
+        private int mNewColor;
+        private ColorChangedEvent(final Object source, final int oldColor, final int newColor) {
+            super(source);
+            mOldColor=oldColor;
+            mNewColor=newColor;
+        }
+        public final int getOldColor() {
+            return mOldColor;
+        }
+        public final int getNewColor() {
+            return mNewColor;
+        }
+    }*/
+
     public interface UpdateListener extends EventListener {
         public void onActiveChannelsChanged(final ActiveChannelsChangedEvent event);
         public void onDataSegmentAdded(final DataSegmentAddedEvent event);
         public void onSampleRateChanged(final SampleRateChangedEvent event);
+        //public void onColorChanged(final ColorChangedEvent event);
     }
 
     private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
