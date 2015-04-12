@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -61,29 +62,24 @@ public class DetailActivity extends ActionBarActivity {
             int SensorGroupId = extras.getInt("sensorGroupId");
             SensorGroup group = SensorGroupController.getActiveGroups().get(SensorGroupId);
 
+            final ListView listView= (ListView) findViewById(R.id.channelList);
+            final DetailChannelListViewAdapter adapter = new DetailChannelListViewAdapter(this,group);
+            listView.setAdapter(adapter);
+
+
             //TODO Adrian: Use information from this class to setup ui
 
             //General
-            String name = group.getName();
-            String unit = group.getUnit();
-            int samplerate = group.getSampleRate();
+            //String name = group.getName();
+            //String unit = group.getUnit();
+            //int samplerate = group.getSampleRate();
 
             //Static info about channels
-            List<SensorChannel> activeChannels = group.getActiveChannels();
+            //List<SensorChannel> activeChannels = group.getActiveChannels();
 
-
-            SensorChannel ch1 = activeChannels.get(0);
+            //SensorChannel ch1 = activeChannels.get(0);
             //ch1.getColor();
-            CheckBox chkb1 = (CheckBox)findViewById(R.id.checkBoxChannel1);
-            chkb1.setText( ch1.getName() );
-
-
-            if (activeChannels.size() > 1) {
-                SensorChannel ch2 = activeChannels.get(1);
-                //ch1.getColor();
-                CheckBox chkb2 = (CheckBox) findViewById(R.id.CheckboxChannel2);
-                chkb2.setText(ch2.getName());
-            }
+            //ch1.getName();
 
             //Getting Data
             //SensorGroup.DataSegment segment = group.getLastDataSegment();

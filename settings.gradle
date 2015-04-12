@@ -1,1 +1,2 @@
-include ':app'
+include ':app', ':color-picker-view'
+project(':color-picker-view').projectDir = new File('libs/color-picker-view')
