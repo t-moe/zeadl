@@ -7,8 +7,8 @@ import java.util.List;
 
 import ch.bfh.android.zeadl.sensor.impl.adc.ADCSensorGroup;
 import ch.bfh.android.zeadl.sensor.impl.color.ColorSensorGroup;
-import ch.bfh.android.zeadl.sensor.impl.gravitydummy.GravityDummyGroup;
-import ch.bfh.android.zeadl.sensor.impl.noise.NoiseSensorGroup;
+import ch.bfh.android.zeadl.sensor.impl.gravity.GravitySensorGroup;
+import ch.bfh.android.zeadl.sensor.impl.dummy.DummyGroup;
 import ch.bfh.android.zeadl.sensor.impl.temp.TempSensorGroup;
 
 /**
@@ -27,9 +27,9 @@ public final class SensorGroupController {
     static {
         //Add available sensor groups here
         mSensorGroups.add(new GroupInfo(TempSensorGroup.class));
-        mSensorGroups.add(new GroupInfo(GravityDummyGroup.class));
+        mSensorGroups.add(new GroupInfo(GravitySensorGroup.class));
         mSensorGroups.add(new GroupInfo(ColorSensorGroup.class));
-        mSensorGroups.add(new GroupInfo(NoiseSensorGroup.class));
+        mSensorGroups.add(new GroupInfo(DummyGroup.class));
         mSensorGroups.add(new GroupInfo(ADCSensorGroup.class));
 
         //TODO: Find the classes automatically using reflection

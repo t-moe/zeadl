@@ -4,7 +4,6 @@ import android.os.Build;
 
 import ch.bfh.android.zeadl.sensor.DisplayName;
 import ch.bfh.android.zeadl.sensor.SensorGroup;
-import ch.bfh.android.zeadl.sensor.impl.RandomChannel;
 
 /**
  * Created by timo on 4/4/15.
