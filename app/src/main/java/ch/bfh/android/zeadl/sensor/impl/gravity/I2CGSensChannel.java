@@ -1,4 +1,4 @@
-package ch.bfh.android.zeadl.sensor.impl.gravitydummy;
+package ch.bfh.android.zeadl.sensor.impl.gravity;
 
 
 import ch.bfh.android.zeadl.I2C;

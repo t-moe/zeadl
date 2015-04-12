@@ -1,16 +1,15 @@
-package ch.bfh.android.zeadl.sensor.impl.gravitydummy;
+package ch.bfh.android.zeadl.sensor.impl.gravity;
 
 import ch.bfh.android.zeadl.sensor.DisplayName;
 import ch.bfh.android.zeadl.sensor.SensorGroup;
-import ch.bfh.android.zeadl.sensor.impl.RandomChannel;
 
 /**
  * Created by timo on 4/11/15.
  */
 
 @DisplayName("Gravity Sensor")
-public class GravityDummyGroup extends SensorGroup {
-    public GravityDummyGroup() {
+public class GravitySensorGroup extends SensorGroup {
+    public GravitySensorGroup() {
         setSampleRate(getMaximalSampleRate());
         addChannel(new I2CGSensChannelX());
         addChannel(new I2CGSensChannelY());

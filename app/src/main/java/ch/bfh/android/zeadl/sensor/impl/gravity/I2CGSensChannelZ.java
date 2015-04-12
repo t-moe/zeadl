@@ -1,4 +1,4 @@
-package ch.bfh.android.zeadl.sensor.impl.gravitydummy;
+package ch.bfh.android.zeadl.sensor.impl.gravity;
 
 /**
  * Created by kevin on 11.04.15.

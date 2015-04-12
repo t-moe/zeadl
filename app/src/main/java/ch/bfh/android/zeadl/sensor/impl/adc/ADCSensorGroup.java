@@ -2,7 +2,7 @@ package ch.bfh.android.zeadl.sensor.impl.adc;
 
 import ch.bfh.android.zeadl.sensor.DisplayName;
 import ch.bfh.android.zeadl.sensor.SensorGroup;
-import ch.bfh.android.zeadl.sensor.impl.RandomChannel;
+import ch.bfh.android.zeadl.sensor.impl.dummy.RandomChannel;
 
 /**
  * Created by kevin on 12.04.15.

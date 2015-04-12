@@ -1,4 +1,4 @@
-package ch.bfh.android.zeadl.sensor.impl;
+package ch.bfh.android.zeadl.sensor.impl.dummy;
 
 import java.util.Random;
 
