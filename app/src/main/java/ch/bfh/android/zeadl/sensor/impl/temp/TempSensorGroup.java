@@ -11,7 +11,7 @@ import ch.bfh.android.zeadl.sensor.impl.RandomChannel;
  */
 
 
-@DisplayName("Temperatur Sensor")
+@DisplayName("Temperature Sensor")
 public class TempSensorGroup  extends SensorGroup {
     public TempSensorGroup() {
         setSampleRate(getMaximalSampleRate());

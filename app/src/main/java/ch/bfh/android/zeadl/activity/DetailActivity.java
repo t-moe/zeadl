@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -18,7 +19,9 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import ch.bfh.android.zeadl.R;
 import ch.bfh.android.zeadl.sensor.SensorChannel;
@@ -66,11 +69,21 @@ public class DetailActivity extends ActionBarActivity {
             int samplerate = group.getSampleRate();
 
             //Static info about channels
-            //List<SensorChannel> activeChannels = group.getActiveChannels();
+            List<SensorChannel> activeChannels = group.getActiveChannels();
 
-            //SensorChannel ch1 = activeChannels.get(0);
+
+            SensorChannel ch1 = activeChannels.get(0);
             //ch1.getColor();
-            //ch1.getName();
+            CheckBox chkb1 = (CheckBox)findViewById(R.id.checkBoxChannel1);
+            chkb1.setText( ch1.getName() );
+
+
+            if (activeChannels.size() > 1) {
+                SensorChannel ch2 = activeChannels.get(1);
+                //ch1.getColor();
+                CheckBox chkb2 = (CheckBox) findViewById(R.id.CheckboxChannel2);
+                chkb2.setText(ch2.getName());
+            }
 
             //Getting Data
             //SensorGroup.DataSegment segment = group.getLastDataSegment();
@@ -115,6 +128,12 @@ public class DetailActivity extends ActionBarActivity {
         TextView tv2 = new TextView(this);
         tv.setText("Column 1  ");
         tv2.setText("Column 2  ");
+
+
+        TextView tvCH1 = (TextView)findViewById(R.id.labelChannel1);
+        tvCH1.setText("Hallo");
+
+
 
 
 
