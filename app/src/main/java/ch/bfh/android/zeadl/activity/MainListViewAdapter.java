@@ -69,7 +69,18 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
         SensorGroup sensorGroup = getItem(position);
 
         title.setText(sensorGroup.getName());
-        info.setText(sensorGroup.getSampleRate()+" Samples/sec in " +sensorGroup.getUnit());
+        int sampleRate= sensorGroup.getSampleRate();
+        String sampleRateText;
+        if(sampleRate>=3600) {
+            sampleRateText = sampleRate/3600.0 + " Samples/sec";
+        } else if( sampleRate>=60) {
+            sampleRateText = sampleRate/60.0 + " Samples/min";
+        } else {
+            sampleRateText = sampleRate + " Samples/hour";
+        }
+
+
+        info.setText(sampleRateText+ " in " +sensorGroup.getUnit());
 
 
         final LinearLayout layout = (LinearLayout) vi.findViewById(R.id.graphview);

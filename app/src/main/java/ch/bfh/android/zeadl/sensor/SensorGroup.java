@@ -18,13 +18,13 @@ public abstract class SensorGroup {
 
     /**
      * Returns the maximal available sample rate. See also: setSampleRate
-     * @return
+     * @return sample rate in samples per hour!
      */
     public abstract int getMaximalSampleRate();
 
 
 
-    private int mSampleRate=10;
+    private int mSampleRate=3600; //one sample per second
 
 
     protected  SensorGroup() {
@@ -34,8 +34,8 @@ public abstract class SensorGroup {
     }
 
     /**
-     * Returns the current configured sample Rate
-     * @return
+     * Returns the current configured samplerate
+     * @return sample rate in samples per hour!
      */
     public final int getSampleRate() {
         return mSampleRate;
@@ -43,7 +43,7 @@ public abstract class SensorGroup {
 
     /**
      * Sets the current sample Rate. Throws an exception if the passed sample rate is out of bounds
-     * @param rate The desired rate
+     * @param rate The desired number of samples per hour!
      */
     public final synchronized void setSampleRate(int rate) {
         if(rate<=0 || rate > getMaximalSampleRate()) {

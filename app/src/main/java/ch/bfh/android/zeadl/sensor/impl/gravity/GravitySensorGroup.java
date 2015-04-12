@@ -24,6 +24,6 @@ public class GravitySensorGroup extends SensorGroup {
 
     @Override
     public int getMaximalSampleRate() {
-        return 2;
+        return 3600/4; //1 sample every 4 secs;
     }
 }
