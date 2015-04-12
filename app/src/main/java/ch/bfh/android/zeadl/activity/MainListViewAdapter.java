@@ -47,7 +47,7 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
         super(a, R.layout.main_list_row, SensorGroupController.getActiveGroups());
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        SensorGroupController.addEventListener(this);
+        SensorGroupController.addEventListener(this); //TODO: remove listener at some point?
     }
 
     public static int dpToPx(float dp)

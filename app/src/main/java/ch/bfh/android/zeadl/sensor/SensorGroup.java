@@ -203,8 +203,8 @@ public abstract class SensorGroup {
         mSensorChannels.add(new ChannelInfo(channel));
     }
 
-    private final List<ChannelInfo> mSensorChannels = new ArrayList<ChannelInfo>();
-    private final List<SensorChannel> mActiveSensorChannels = new ArrayList<SensorChannel>();
+    private final List<ChannelInfo> mSensorChannels = Collections.synchronizedList(new ArrayList<ChannelInfo>());
+    private final List<SensorChannel> mActiveSensorChannels = Collections.synchronizedList(new ArrayList<SensorChannel>());
 
 
     /**
@@ -261,6 +261,7 @@ public abstract class SensorGroup {
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
                 DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
                 synchronized (mListeners) {
                     for(UpdateListener listener : mListeners) {
@@ -292,6 +293,7 @@ public abstract class SensorGroup {
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
                 DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
                 synchronized (mListeners) {
                     for (UpdateListener listener : mListeners) {
@@ -320,6 +322,7 @@ public abstract class SensorGroup {
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
                 DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
                 synchronized (mListeners) {
                     for (UpdateListener listener : mListeners) {

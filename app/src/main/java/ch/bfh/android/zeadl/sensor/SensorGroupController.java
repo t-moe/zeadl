@@ -22,8 +22,8 @@ import ch.bfh.android.zeadl.sensor.impl.temp.TempSensorGroup;
  */
 public final class SensorGroupController {
 
-    private final static List<GroupInfo> mSensorGroups = new ArrayList<GroupInfo>();
-    private final static List<SensorGroup> mActiveSensorGroups = new ArrayList<SensorGroup>();
+    private final static List<GroupInfo> mSensorGroups = Collections.synchronizedList(new ArrayList<GroupInfo>());
+    private final static List<SensorGroup> mActiveSensorGroups = Collections.synchronizedList(new ArrayList<SensorGroup>());
     static {
         //Add available sensor groups here
         mSensorGroups.add(new GroupInfo(TempSensorGroup.class));
