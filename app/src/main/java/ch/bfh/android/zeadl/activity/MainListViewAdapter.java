@@ -35,7 +35,8 @@ import ch.bfh.android.zeadl.sensor.SensorGroupController;
 /**
  * Created by timo on 4/11/15.
  */
-public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements SensorGroupController.UpdateListener {
+public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
+        implements SensorGroupController.UpdateListener, SensorGroup.UpdateListener {
     private Activity activity;
     private LayoutInflater inflater=null;
 
@@ -79,9 +80,15 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
             sampleRateText = sampleRate + " Samples/hour";
         }
 
-
         info.setText(sampleRateText+ " in " +sensorGroup.getUnit());
 
+        reCreateGraph(vi,sensorGroup);
+
+        return vi;
+    }
+
+
+    private void reCreateGraph(View vi, SensorGroup sensorGroup) {
 
         final LinearLayout layout = (LinearLayout) vi.findViewById(R.id.graphview);
         layout.removeAllViews();
@@ -111,7 +118,7 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
             mRenderer.setLegendHeight(dpToPx(27));
             marginBottom= dpToPx(-3);
         }
-        mRenderer.setMargins(new int[]{dpToPx(12), dpToPx(18), marginBottom, dpToPx(6)});
+        mRenderer.setMargins(new int[]{dpToPx(12), dpToPx(30), marginBottom, dpToPx(6)});
         mRenderer.setYLabelsAlign(Paint.Align.RIGHT, 0);
         mRenderer.setYLabelsPadding(dpToPx(5));
 
@@ -127,7 +134,7 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
         int chInd=0;
         for(SensorChannel channel : dataSegment.getChannels()) {
 
-            XYSeriesRenderer chRenderer = new XYSeriesRenderer();
+            final XYSeriesRenderer chRenderer = new XYSeriesRenderer();
             chRenderer.setColor(channel.getColor());
             chRenderer.setPointStyle(PointStyle.CIRCLE);
             chRenderer.setFillPoints(true);
@@ -153,6 +160,13 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
                 mRenderer.setPointSize(0);
                 chRenderer.setDisplayChartValues(false);
             }
+
+            channel.addEventListener(new SensorChannel.UpdateListener() {
+                @Override
+                public void onColorChanged(SensorChannel.ColorChangedEvent event) {
+                    chRenderer.setColor(event.getNewColor());
+                }
+            });
 
             mDataset.addSeries(channelSeries);
             chInd++;
@@ -203,12 +217,15 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
         });
 
         layout.addView(mChartView);
-
-        return vi;
     }
 
     @Override
     public void onActiveGroupsChanged(SensorGroupController.ActiveGroupsChangedEvent event) {
+        if(event.getType()== SensorGroupController.ActiveGroupsChangedEvent.Type.GROUP_ACTIVATED) {
+            event.getGroup().addEventListener(this);
+        } else {
+            event.getGroup().removeEventListener(this);
+        }
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -216,5 +233,28 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup> implements Se
             }
         });
 
+    }
+
+    @Override
+    public void onDataSegmentAdded(SensorGroup.DataSegmentAddedEvent event) {
+        //SensorGroup sensorGroup = (SensorGroup)event.getSource();
+        //TODO: Change this to only update the changed group
+        //See also: http://stackoverflow.com/questions/3724874/how-can-i-update-a-single-row-in-a-listview
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public void onActiveChannelsChanged(SensorGroup.ActiveChannelsChangedEvent event) {
+        //Not needed
+    }
+
+    @Override
+    public void onSampleRateChanged(SensorGroup.SampleRateChangedEvent event) {
+        //Not needed
     }
 }

@@ -190,6 +190,7 @@ public abstract class SensorGroup {
      */
     public final DataSegment getLastDataSegment() {
         synchronized (mDataSegments) {
+            if(mDataSegments.isEmpty()) return null;
             return mDataSegments.get(mDataSegments.size() - 1);
         }
     }
@@ -403,27 +404,10 @@ public abstract class SensorGroup {
         }
     }
 
-    /*public static class ColorChangedEvent extends EventObject {
-        private int mOldColor;
-        private int mNewColor;
-        private ColorChangedEvent(final Object source, final int oldColor, final int newColor) {
-            super(source);
-            mOldColor=oldColor;
-            mNewColor=newColor;
-        }
-        public final int getOldColor() {
-            return mOldColor;
-        }
-        public final int getNewColor() {
-            return mNewColor;
-        }
-    }*/
-
     public interface UpdateListener extends EventListener {
         public void onActiveChannelsChanged(final ActiveChannelsChangedEvent event);
         public void onDataSegmentAdded(final DataSegmentAddedEvent event);
         public void onSampleRateChanged(final SampleRateChangedEvent event);
-        //public void onColorChanged(final ColorChangedEvent event);
     }
 
     private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();

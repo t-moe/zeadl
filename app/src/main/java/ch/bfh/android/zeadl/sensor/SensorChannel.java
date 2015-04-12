@@ -3,6 +3,11 @@ package ch.bfh.android.zeadl.sensor;
 
 import android.graphics.Color;
 
+import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.EventObject;
+import java.util.List;
+
 /**
  * Created by timo on 3/24/15.
  */
@@ -50,6 +55,46 @@ public abstract class SensorChannel {
      * @param color color to use for drawings
      */
     public final synchronized void setColor(int color) {
+        if(color==mColor) return;
+        int oldColor = mColor;
         mColor = color;
+        synchronized (mListeners) {
+            for (UpdateListener listener : mListeners) {
+                listener.onColorChanged(new ColorChangedEvent(this, oldColor, mColor));
+            }
+        }
     }
+
+    public static class ColorChangedEvent extends EventObject {
+        private int mOldColor;
+        private int mNewColor;
+        private ColorChangedEvent(final Object source, final int oldColor, final int newColor) {
+            super(source);
+            mOldColor=oldColor;
+            mNewColor=newColor;
+        }
+        public final int getOldColor() {
+            return mOldColor;
+        }
+        public final int getNewColor() {
+            return mNewColor;
+        }
+    }
+
+    public interface UpdateListener extends EventListener {
+        public void onColorChanged(final ColorChangedEvent event);
+    }
+
+    private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
+    public synchronized void addEventListener(UpdateListener listener)  {
+        synchronized (mListeners) {
+            mListeners.add(listener);
+        }
+    }
+    public synchronized void removeEventListener(UpdateListener listener)   {
+        synchronized (mListeners) {
+            mListeners.remove(listener);
+        }
+    }
+
 }
