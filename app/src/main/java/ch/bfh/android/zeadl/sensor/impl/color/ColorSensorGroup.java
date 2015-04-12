@@ -27,7 +27,7 @@ public class ColorSensorGroup extends SensorGroup {
     }
 
     public int getMaximalSampleRate() {
-        return 5;
+        return 3600*2; //2 samples per sec
     }
 
 }

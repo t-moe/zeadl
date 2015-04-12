@@ -20,6 +20,6 @@ public class ADCSensorGroup extends SensorGroup {
     }
 
     public int getMaximalSampleRate() {
-        return 12;
+        return 3600; //1 sample per sec
     }
 }

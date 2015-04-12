@@ -32,11 +32,7 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
         while(!isCancelled()) {
             //Log.d("Zeadl Thread","Thread working...");
 
-            try {
-                Thread.sleep(1000/mUpdateFreq,0);
-            } catch (InterruptedException e) {
-                if(isCancelled()) break;
-            }
+            long startTime =  System.currentTimeMillis();
 
             int channelIdx=0;
             for(SensorGroup group : SensorGroupController.getActiveGroups()) {
@@ -44,7 +40,7 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
                     while (channelIdx >= mUpdateCnt.size()) { //ensure mUpdateCnt obj has the right size
                         mUpdateCnt.add(0);
                     }
-                    int div = mUpdateFreq / group.getSampleRate(); //number of times we need to wait
+                    int div = mUpdateFreq / group.getSampleRate() -1; //number of times we need to wait
                     int cur = mUpdateCnt.get(channelIdx);
                     if (cur >= div) { //time to update
                         mUpdateCnt.set(channelIdx, 0);
@@ -52,6 +48,13 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
                         SensorGroup.DataSegment segment = group.getLastDataSegment();
                         Date time = new Date(); //Timestamp of now
                         List<Float> datapoints = new ArrayList<Float>();
+
+                        /*
+                        //Debugging
+                        if(!segment.getEntries().isEmpty()) {
+                            long milidiff = time.getTime() - segment.getEntries().get(segment.getEntries().size() - 1).getTime().getTime();
+                            Log.d("worker", "Sample rate " + group.getSampleRate() + " timediff " + milidiff);
+                        }*/
 
                         for (SensorChannel channel : segment.getChannels()) {
                             datapoints.add(channel.getSample());
@@ -64,6 +67,18 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
                     }
                     channelIdx++;
                 }
+            }
+
+            int timerFreq= mUpdateFreq; //Copy to ensure we use the same value for the following calculations
+            int sleepTime = 3600*1000/timerFreq;
+            long elapsedMillis = System.currentTimeMillis() - startTime;
+            sleepTime-=elapsedMillis;
+            //if(mUpdateFreq!=1) Log.d("worker","elapsed "+elapsedMillis);
+            if(sleepTime<=0) continue;
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                if(isCancelled()) break;
             }
 
         }
@@ -111,7 +126,7 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
                 sampleRates[i++] = sensorGroup.getSampleRate();
             }
             if (sampleRates.length == 0) {
-                mUpdateFreq = 1;
+                mUpdateFreq = 3600; //1 sample per second
             } else {
                 mUpdateFreq = lcm(sampleRates);
             }
