@@ -28,7 +28,10 @@ public class I2CColorSensor {
     private I2C i2c_tcs;
     private byte[] i2cCommBuffer_temp = new byte[16];
 
+    private byte instanceCnt = 0;
+
     public void start() {
+        instanceCnt++;
         if (ready) {
             return;
         }
@@ -44,8 +47,11 @@ public class I2CColorSensor {
     }
 
     public void stop() {
-        i2c_tcs.close();
-        ready=false;
+        instanceCnt--;
+        if (instanceCnt <= 0) {
+            i2c_tcs.close();
+            ready=false;
+        }
     }
 
     public int read(byte[] buffer,int length) {

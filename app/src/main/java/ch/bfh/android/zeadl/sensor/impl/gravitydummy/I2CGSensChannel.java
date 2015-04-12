@@ -35,8 +35,10 @@ public abstract class I2CGSensChannel extends SensorChannel {
     protected static byte[] i2cCommBuffer_temp = new byte[16];
     protected static boolean ready = false;
     protected static boolean fullScale = false;
+    private static byte instanceCnt = 0;
 
     public void start() {
+        instanceCnt++;
         if (ready) {
             return;
         }
@@ -52,7 +54,11 @@ public abstract class I2CGSensChannel extends SensorChannel {
     }
 
     public void stop() {
-        i2c_lis.close();
-        ready=false;
+        instanceCnt--;
+        if (instanceCnt <= 0) {
+            i2c_lis.close();
+            ready=false;
+        }
+
     }
 }
