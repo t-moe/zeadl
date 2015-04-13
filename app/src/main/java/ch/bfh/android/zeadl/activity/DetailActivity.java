@@ -64,29 +64,9 @@ public class DetailActivity extends ActionBarActivity {
             int chanNum = activeChannels.size();
             ChannelNames = new String[chanNum];
 
-            for(int i=0;i<chanNum;i++){
+            for(int i=0;i<chanNum;i++) {
                 ChannelNames[i] = activeChannels.get(i).getName();
             }
-
-<<<<<<< HEAD
-=======
-            samplerate = group.getSampleRate();
-
->>>>>>> origin/dev_luckk
-            /*
-            Button buttonBack = (Button) findViewById(R.id.buttonBack);
-            buttonBack.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(DetailActivity.this,MainActivity.class);
-                    startActivity(i);
-                }
-<<<<<<< HEAD
-            });  //*/
-=======
-            });
-            
->>>>>>> origin/dev_luckk
 
             final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
             barSamplerate.setMax(group.getMaximalSampleRate());
@@ -114,49 +94,7 @@ public class DetailActivity extends ActionBarActivity {
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {}
             });
-
-
-            /*
-            Button buttonSaveTable = (Button) findViewById(R.id.buttonSaveTable);
-            buttonSaveTable.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FileClass fc = new FileClass();
-                    try {
-                        fc.saveSegment(group.getLastDataSegment());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-<<<<<<< HEAD
-            }); //*/
-
-=======
-            });
-            
-
-            //TODO Adrian: Use information from this class to setup ui      -> Thank you!
-
-            //General
-            //String name = group.getName();
-            //String unit = group.getUnit();
-            //int samplerate = group.getSampleRate();
-
-            //Static info about channels
-            //List<SensorChannel> activeChannels = group.getActiveChannels();
-
-            //SensorChannel ch1 = activeChannels.get(0);
-            //ch1.getColor();
-            //ch1.getName();
-
-            //Getting Data
-            //SensorGroup.DataSegment segment = group.getLastDataSegment();
-            //segment.getChannels();
-            //segment.getEntries();
->>>>>>> origin/dev_luckk
         }
-
-
 
         // Add the Tabs
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
@@ -185,7 +123,6 @@ public class DetailActivity extends ActionBarActivity {
         tc.addSegment(group.getLastDataSegment());
     }
 
-    //*
     private String formatSampleRate(int samplerate){
         String val, temp;
         if(samplerate>=3600){
@@ -201,7 +138,7 @@ public class DetailActivity extends ActionBarActivity {
         }
 
         return val;
-    } //*/
+    }
 
 
     @Override
