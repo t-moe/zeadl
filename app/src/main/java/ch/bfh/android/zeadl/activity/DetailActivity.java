@@ -1,10 +1,16 @@
 package ch.bfh.android.zeadl.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +37,11 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -200,6 +210,43 @@ public class DetailActivity extends ActionBarActivity {
         layout.addView(mChartView);
     }
 
+    private void saveGraph() {
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layoutChart);
+        View v = layout.getChildAt(0);
+
+        Bitmap b = Bitmap.createBitmap(v.getMeasuredWidth(),
+                v.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        c.drawColor(Color.LTGRAY);
+        v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
+        v.draw(c);
+
+        try {
+            String filename= "/sdcard/DCIM/Graph"+System.currentTimeMillis()+".jpg";
+            FileOutputStream output = new FileOutputStream(filename);
+
+            // Compress into png format image from 0% - 100%
+            b.compress(Bitmap.CompressFormat.JPEG, 100, output);
+            output.flush();
+            output.close();
+            ContentValues values = new ContentValues();
+
+            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            values.put(MediaStore.MediaColumns.DATA, filename);
+
+            getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        }
+
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Toast.makeText(getApplicationContext(),"Graph saved to gallery",Toast.LENGTH_SHORT).show();
+    }
+
     private String formatSampleRate(int samplerate){
         String val, temp;
         if(samplerate>=3600){
@@ -235,7 +282,7 @@ public class DetailActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_savegraph) {
             Log.d("DetailActivity", "Action Save Graph");
-            Toast.makeText(getApplicationContext(),"not implemented yet",Toast.LENGTH_SHORT).show();
+            saveGraph();
             return true;
         }
 
