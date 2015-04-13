@@ -59,6 +59,7 @@ public class DetailActivity extends ActionBarActivity {
     private List<SensorChannel> activeChannels;
     private String[] ChannelNames;
     private SensorGroup group;
+    private SensorGroup.UpdateListener mUpdateListener = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,25 @@ public class DetailActivity extends ActionBarActivity {
                 ChannelNames[i] = activeChannels.get(i).getName();
             }
 
-            reCreateGraph((LinearLayout) findViewById(R.id.layoutChart),group);
+            reCreateGraph();
+
+            mUpdateListener = new SensorGroup.UpdateListener() {
+                @Override
+                public void onActiveChannelsChanged(SensorGroup.ActiveChannelsChangedEvent event) {
+                    //not needed
+                }
+
+                @Override
+                public void onDataSegmentAdded(SensorGroup.DataSegmentAddedEvent event) {
+                    reCreateGraph();
+                }
+
+                @Override
+                public void onSampleRateChanged(SensorGroup.SampleRateChangedEvent event) {
+                    //not needed
+                }
+            };
+            group.addEventListener(mUpdateListener);
 
             final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
             barSamplerate.setMax(group.getMaximalSampleRate());
@@ -140,13 +159,26 @@ public class DetailActivity extends ActionBarActivity {
         tc.addSegment(group.getLastDataSegment());
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mUpdateListener!=null) {
+            group.removeEventListener(mUpdateListener);
+            mUpdateListener=null;
+        }
+        final LinearLayout layout = (LinearLayout) findViewById(R.id.layoutChart);
+        if(layout!=null) {
+            layout.removeAllViews();
+        }
+    }
 
     public static int dpToPx(float dp)
     {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    private void reCreateGraph(LinearLayout layout, SensorGroup sensorGroup) {
+    private void reCreateGraph() {
+        final LinearLayout layout = (LinearLayout) findViewById(R.id.layoutChart);
         layout.removeAllViews();
 
         // create dataset and renderer
@@ -188,7 +220,7 @@ public class DetailActivity extends ActionBarActivity {
         //mRenderer.setZoomLimits(new double[]{startTime.getTime(),d.getTime(),0,0});
 
 
-        final SensorGroup.DataSegment dataSegment = sensorGroup.getLastDataSegment();
+        final SensorGroup.DataSegment dataSegment = group.getLastDataSegment();
         for (SensorChannel channel : dataSegment.getChannels()) {
 
             final XYSeriesRenderer chRenderer = new SensorChannelRenderer(channel);
@@ -300,13 +332,8 @@ public class DetailActivity extends ActionBarActivity {
 
         if (id == R.id.action_cleargraph) {
             Log.d("DetailActivity", "Action Clear Graph");
-            Toast.makeText(getApplicationContext(),"not implemented yet",Toast.LENGTH_SHORT).show();
-            return true;
-        }
-
-        if (id == R.id.action_back) {
-            Intent i = new Intent(DetailActivity.this,MainActivity.class);
-            startActivity(i);
+            group.clearAllDataSegments();
+            Toast.makeText(getApplicationContext(),"All Data removed",Toast.LENGTH_SHORT).show();
             return true;
         }
 

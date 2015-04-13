@@ -202,6 +202,21 @@ public abstract class SensorGroup {
     }
 
     /**
+     * Clears all data segments
+     */
+    public final void clearAllDataSegments() {
+        final DataSegment newSegment = new DataSegment(this,new ArrayList<>(mActiveSensorChannels)); //COPY channnels into new datasegment
+        mDataSegments.clear();
+        mDataSegments.add(newSegment);
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
+                listener.onDataSegmentAdded(new DataSegmentAddedEvent(SensorGroup.this,newSegment));
+            }
+        });
+    }
+
+    /**
      * Adds a new Channel to the available channels. Call this method in the constructor of your SensorGroup implementation
      * @param channel
      */
