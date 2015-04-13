@@ -56,13 +56,14 @@ public abstract class SensorChannel {
      */
     public final synchronized void setColor(int color) {
         if(color==mColor) return;
-        int oldColor = mColor;
+        final int oldColor = mColor;
         mColor = color;
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
-                listener.onColorChanged(new ColorChangedEvent(this, oldColor, mColor));
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
+                listener.onColorChanged(new ColorChangedEvent(SensorChannel.this, oldColor, mColor));
             }
-        }
+        });
     }
 
     public static class ColorChangedEvent extends EventObject {
@@ -85,16 +86,19 @@ public abstract class SensorChannel {
         public void onColorChanged(final ColorChangedEvent event);
     }
 
-    private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
-    public synchronized void addEventListener(UpdateListener listener)  {
-        synchronized (mListeners) {
-            mListeners.add(listener);
-        }
+    private final EventListenerCollection<UpdateListener> mListeners = new EventListenerCollection<>();
+    public synchronized void addEventListener(final UpdateListener listener)  {
+        mListeners.addListener(listener);
     }
-    public synchronized void removeEventListener(UpdateListener listener)   {
-        synchronized (mListeners) {
-            mListeners.remove(listener);
-        }
+    public synchronized void removeEventListener(final UpdateListener listener) {
+        mListeners.removeListener(listener);
+    }
+
+    public synchronized void addWeakEventListener(final UpdateListener listener)  {
+        mListeners.addWeakListener(listener);
+    }
+    public synchronized void removeWeakEventListener(final UpdateListener listener) {
+        mListeners.removeWeakListener(listener);
     }
 
 }

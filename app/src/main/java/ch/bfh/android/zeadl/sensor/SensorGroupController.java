@@ -91,16 +91,17 @@ public final class SensorGroupController {
         SensorGroup group = gi.getInstance();
         if(group!=null && mActiveSensorGroups.contains(group)) return null;
         if(gi.create()) {
-            group = gi.getInstance();
-            mActiveSensorGroups.add(group);
+            final SensorGroup newGroup = gi.getInstance();
+            mActiveSensorGroups.add(newGroup);
 
-            synchronized (mListeners) {
-                for (UpdateListener listener : mListeners) {
-                    listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_ACTIVATED, group));
+            mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+                @Override
+                public void foreach(UpdateListener listener) {
+                    listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_ACTIVATED, newGroup));
                 }
-            }
+            });
 
-            return group;
+            return newGroup;
         }
         return null;
     }
@@ -110,16 +111,16 @@ public final class SensorGroupController {
      * @param group The instance of the group to deactivate
      * @return bool on success
      */
-    public static synchronized final boolean deactivate(SensorGroup group) {
+    public static synchronized final boolean deactivate(final SensorGroup group) {
         if(!mActiveSensorGroups.contains(group)) return false;
         mActiveSensorGroups.remove(group);
 
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
                 listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_DEACTIVATED, group));
             }
-        }
-
+        });
 
         return true;
     }
@@ -129,16 +130,17 @@ public final class SensorGroupController {
      * @param gi The GroupInfo object retrived from getAvailableGroups()
      * @return bool on success
      */
-    public static synchronized final boolean deactivate(GroupInfo gi) {
-        SensorGroup group =gi.getInstance();
+    public static synchronized final boolean deactivate(final GroupInfo gi) {
+        final SensorGroup group =gi.getInstance();
         if(!mActiveSensorGroups.contains(group)) return false;
         mActiveSensorGroups.remove(group);
 
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
                 listener.onActiveGroupsChanged(new ActiveGroupsChangedEvent(null,ActiveGroupsChangedEvent.Type.GROUP_DEACTIVATED, group));
             }
-        }
+        });
         return true;
     }
 
@@ -147,7 +149,7 @@ public final class SensorGroupController {
      * @param gi The GroupInfo object retrived from getAvailableGroups()
      * @return true if the SensorGroup is active
      */
-    public static final boolean isActive(GroupInfo gi) {
+    public static final boolean isActive(final GroupInfo gi) {
         return mActiveSensorGroups.contains(gi.getInstance());
     }
 
@@ -193,18 +195,19 @@ public final class SensorGroupController {
         public void onActiveGroupsChanged(final ActiveGroupsChangedEvent event);
     }
 
-    private static final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
-    public static synchronized void addEventListener(UpdateListener listener)  {
-        synchronized (mListeners) {
-            mListeners.add(listener);
-        }
+    private static final EventListenerCollection<UpdateListener> mListeners = new EventListenerCollection<>();
+    public static synchronized void addEventListener(final UpdateListener listener)  {
+        mListeners.addListener(listener);
     }
-    public static synchronized void removeEventListener(UpdateListener listener)   {
-        synchronized (mListeners) {
-            mListeners.remove(listener);
-        }
+    public static synchronized void removeEventListener(final UpdateListener listener) {
+        mListeners.removeListener(listener);
     }
 
-
+    public static synchronized void addWeakEventListener(final UpdateListener listener)  {
+        mListeners.addWeakListener(listener);
+    }
+    public static synchronized void removeWeakEventListener(final UpdateListener listener) {
+        mListeners.removeWeakListener(listener);
+    }
 
 }

@@ -6,6 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +36,9 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
             long startTime =  System.currentTimeMillis();
 
             int channelIdx=0;
-            for(SensorGroup group : SensorGroupController.getActiveGroups()) {
+
+            for (Iterator<SensorGroup> it = SensorGroupController.getActiveGroups().iterator(); it.hasNext(); ) {
+                SensorGroup group = it.next();
                 synchronized (mLockObj) {
                     while (channelIdx >= mUpdateCnt.size()) { //ensure mUpdateCnt obj has the right size
                         mUpdateCnt.add(0);

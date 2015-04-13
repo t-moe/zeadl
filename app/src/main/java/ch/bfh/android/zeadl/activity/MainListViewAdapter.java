@@ -40,8 +40,7 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
     private Activity activity;
     private LayoutInflater inflater=null;
 
-    private final int limit_labels_visible = 50;
-    private final int limit_datasize = 300;
+
 
     public MainListViewAdapter(Activity a) {
         super(a, R.layout.main_list_row, SensorGroupController.getActiveGroups());
@@ -131,11 +130,9 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
 
 
         final SensorGroup.DataSegment dataSegment = sensorGroup.getLastDataSegment();
-        int chInd=0;
         for(SensorChannel channel : dataSegment.getChannels()) {
 
-            final XYSeriesRenderer chRenderer = new XYSeriesRenderer();
-            chRenderer.setColor(channel.getColor());
+            final XYSeriesRenderer chRenderer = new SensorChannelRenderer(channel);
             chRenderer.setPointStyle(PointStyle.CIRCLE);
             chRenderer.setFillPoints(true);
             chRenderer.setLineWidth(dpToPx(2));
@@ -146,76 +143,11 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
             chRenderer.setChartValuesSpacing(dpToPx(5));
             mRenderer.addSeriesRenderer(chRenderer);
 
-            TimeSeries channelSeries = new TimeSeries(channel.getName());
-            List<SensorGroup.DataSegment.Entry> entries = dataSegment.getEntries();
-
-            int startInd = (entries.size()>limit_datasize) ? (entries.size()-limit_datasize): 0;
-
-            for (int i=startInd; i<entries.size(); i++ ) {
-                SensorGroup.DataSegment.Entry entry = entries.get(i);
-                channelSeries.add(entry.getTime(),entry.getChannelData().get(chInd));
-            }
-
-            if(entries.size()>=limit_labels_visible) {
-                mRenderer.setPointSize(0);
-                chRenderer.setDisplayChartValues(false);
-            }
-
-            channel.addEventListener(new SensorChannel.UpdateListener() {
-                @Override
-                public void onColorChanged(SensorChannel.ColorChangedEvent event) {
-                    chRenderer.setColor(event.getNewColor());
-                }
-            });
-
+            TimeSeries channelSeries = new SensorChannelSeries(channel,dataSegment,chRenderer);
             mDataset.addSeries(channelSeries);
-            chInd++;
         }
 
-
-        final GraphicalView mChartView = ChartFactory.getTimeChartView(activity, mDataset, mRenderer,
-                "H:mm:ss");
-
-        dataSegment.addEventListener(new SensorGroup.DataSegment.EntryAddedListener() {
-            @Override
-            public void onEntryAdded(SensorGroup.DataSegment.EntryAddedEvent event) {
-                SensorGroup.DataSegment.Entry entry = event.getEntry();
-
-                //Check if we have exactly limit_labels_visible visible data points
-                if(((SensorGroup.DataSegment)event.getSource()).getEntries().size()==limit_labels_visible) {
-                    //Sadly we can not set the point size to 0 here without creating a new Graph.
-                    //This is because the TimeChart uses a ScatterChart which has a private size member which is initialized in the ctor.
-                    //So we use reflection to hack our way into the class
-                    try {
-                        Field f = ScatterChart.class.getDeclaredField("size");
-                        f.setAccessible(true);
-                        f.setInt(((TimeChart) mChartView.getChart()).getPointsChart(),0);
-                    } catch (Exception e){
-                        //no access :(
-                    }
-
-                    for(int chInd=0; chInd<dataSegment.getChannels().size();chInd++) {
-                        ((XYSeriesRenderer) mRenderer.getSeriesRendererAt(chInd)).setDisplayChartValues(false);
-                    }
-                }
-
-                for(int chInd=0; chInd<dataSegment.getChannels().size();chInd++) {
-                    TimeSeries channelSeries = (TimeSeries)mDataset.getSeries()[chInd];
-
-                    while(channelSeries.getItemCount() > limit_datasize) {
-                        channelSeries.remove(0);
-                    }
-
-                    channelSeries.add(entry.getTime(),entry.getChannelData().get(chInd));
-                }
-
-                //mRenderer.setPanLimits(new double[]{startTime.getTime(), d.getTime() + 1000, 0, 60});
-                //mRenderer.setZoomLimits(new double[]{startTime.getTime(),d.getTime(),0,0});
-
-                mChartView.repaint();
-            }
-        });
-
+        final GraphicalView mChartView =  new SensorTimeChart(activity, mDataset, mRenderer,dataSegment);
         layout.addView(mChartView);
     }
 

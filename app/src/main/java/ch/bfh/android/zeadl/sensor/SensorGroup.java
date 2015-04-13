@@ -50,13 +50,14 @@ public abstract class SensorGroup {
             throw new IllegalArgumentException();
         }
         if(rate==mSampleRate) return;
-        int oldSampleRate = mSampleRate;
+        final int oldSampleRate = mSampleRate;
         mSampleRate = rate;
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
-                listener.onSampleRateChanged(new SampleRateChangedEvent(this,oldSampleRate,mSampleRate));
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
+                listener.onSampleRateChanged(new SampleRateChangedEvent(SensorGroup.this,oldSampleRate,mSampleRate));
             }
-        }
+        });
     }
 
 
@@ -99,11 +100,12 @@ public abstract class SensorGroup {
             if(e.getChannelData().size()!=mChannels.size())
                 throw new IllegalArgumentException();
             mEntries.add(e);
-            synchronized (mListeners) {
-                for (EntryAddedListener listener : mListeners) {
-                    listener.onEntryAdded(new EntryAddedEvent(this,e));
+            mListeners.fireEvent(new EventListenerCollection.EventFireHelper<EntryAddedListener>() {
+                @Override
+                public void foreach(EntryAddedListener listener) {
+                    listener.onEntryAdded(new EntryAddedEvent(DataSegment.this,e));
                 }
-            }
+            });
         }
 
         public final SensorGroup getSensorGroup() {
@@ -124,16 +126,19 @@ public abstract class SensorGroup {
             public void onEntryAdded(final EntryAddedEvent event);
         }
 
-        private final List<EntryAddedListener> mListeners = new ArrayList<EntryAddedListener>();
+        private final EventListenerCollection<EntryAddedListener> mListeners = new EventListenerCollection<>();
         public synchronized void addEventListener(final EntryAddedListener listener)  {
-            synchronized (mListeners) {
-                mListeners.add(listener);
-            }
+            mListeners.addListener(listener);
         }
-        public synchronized void removeEventListener(final EntryAddedListener listener)   {
-            synchronized (mListeners) {
-                mListeners.remove(listener);
-            }
+        public synchronized void removeEventListener(final EntryAddedListener listener) {
+            mListeners.removeListener(listener);
+        }
+
+        public synchronized void addWeakEventListener(final EntryAddedListener listener)  {
+            mListeners.addWeakListener(listener);
+        }
+        public synchronized void removeWeakEventListener(final EntryAddedListener listener) {
+            mListeners.removeWeakListener(listener);
         }
 
 
@@ -249,25 +254,27 @@ public abstract class SensorGroup {
      */
     public synchronized final SensorChannel activate(ChannelInfo ci) {
         if(mActiveSensorChannels.contains(ci)) return null;
-        SensorChannel channel =ci.getInstance();
+        final SensorChannel channel =ci.getInstance();
         channel.start();
         mActiveSensorChannels.add(ci.getInstance());
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
-                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(this, ActiveChannelsChangedEvent.Type.CHANNEL_ACTIVATED, channel));
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
+                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(SensorGroup.this, ActiveChannelsChangedEvent.Type.CHANNEL_ACTIVATED, channel));
             }
-        }
+        });
 
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
-                DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                final DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
                 mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
-                synchronized (mListeners) {
-                    for(UpdateListener listener : mListeners) {
-                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(this,newSegment));
+                mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+                    @Override
+                    public void foreach(UpdateListener listener) {
+                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(SensorGroup.this,newSegment));
                     }
-                }
+                });
             }
         }
         return channel;
@@ -280,26 +287,28 @@ public abstract class SensorGroup {
      * @return bool on success
      */
     public synchronized final boolean deactivate(ChannelInfo ci) {
-        SensorChannel channel =ci.getInstance();
+        final SensorChannel channel =ci.getInstance();
         if(!mActiveSensorChannels.contains(channel)) return false;
         channel.stop();
         mActiveSensorChannels.remove(channel);
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
-                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(this, ActiveChannelsChangedEvent.Type.CHANNEL_DEACTIVATED, channel));
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
+                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(SensorGroup.this, ActiveChannelsChangedEvent.Type.CHANNEL_DEACTIVATED, channel));
             }
-        }
+        });
 
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
-                DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                final DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
                 mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
-                synchronized (mListeners) {
-                    for (UpdateListener listener : mListeners) {
-                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(this,newSegment));
+                mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+                    @Override
+                    public void foreach(UpdateListener listener) {
+                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(SensorGroup.this,newSegment));
                     }
-                }
+                });
             }
         }
         return true;
@@ -310,25 +319,28 @@ public abstract class SensorGroup {
      * @param ch The instance of the channel to deactivate
      * @return bool on success
      */
-    public synchronized final boolean deactivate(SensorChannel ch) {
+    public synchronized final boolean deactivate(final SensorChannel ch) {
         if(!mActiveSensorChannels.contains(ch)) return false;
         ch.stop();
         mActiveSensorChannels.remove(ch);
-        synchronized (mListeners) {
-            for (UpdateListener listener : mListeners) {
-                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(this, ActiveChannelsChangedEvent.Type.CHANNEL_DEACTIVATED, ch));
+        mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+            @Override
+            public void foreach(UpdateListener listener) {
+                listener.onActiveChannelsChanged(new ActiveChannelsChangedEvent(SensorGroup.this, ActiveChannelsChangedEvent.Type.CHANNEL_DEACTIVATED, ch));
             }
-        }
+        });
+
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
-                DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                final DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
                 mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
-                synchronized (mListeners) {
-                    for (UpdateListener listener : mListeners) {
-                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(this,newSegment));
+                mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
+                    @Override
+                    public void foreach(UpdateListener listener) {
+                        listener.onDataSegmentAdded(new DataSegmentAddedEvent(SensorGroup.this,newSegment));
                     }
-                }
+                });
             }
         }
         return true;
@@ -413,16 +425,19 @@ public abstract class SensorGroup {
         public void onSampleRateChanged(final SampleRateChangedEvent event);
     }
 
-    private final List<UpdateListener> mListeners = new ArrayList<UpdateListener>();
-    public synchronized void addEventListener(UpdateListener listener)  {
-        synchronized (mListeners) {
-            mListeners.add(listener);
-        }
+    private final EventListenerCollection<UpdateListener> mListeners = new EventListenerCollection<>();
+    public synchronized void addEventListener(final UpdateListener listener)  {
+        mListeners.addListener(listener);
     }
-    public synchronized void removeEventListener(UpdateListener listener)   {
-        synchronized (mListeners) {
-            mListeners.remove(listener);
-        }
+    public synchronized void removeEventListener(final UpdateListener listener) {
+        mListeners.removeListener(listener);
+    }
+
+    public synchronized void addWeakEventListener(final UpdateListener listener)  {
+        mListeners.addWeakListener(listener);
+    }
+    public synchronized void removeWeakEventListener(final UpdateListener listener) {
+        mListeners.removeWeakListener(listener);
     }
 
 
