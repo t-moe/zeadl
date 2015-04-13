@@ -36,7 +36,7 @@ public class TableClass {
         TableRow row = new TableRow(activity);
         TextView tv;
         Date date;
-        SimpleDateFormat df = new SimpleDateFormat("yyMMddHHmmss.S");
+        SimpleDateFormat df = new SimpleDateFormat("dd hh:mm:ss.SSS");
 
         row.setLayoutParams(params);
         row.setPadding(5,1,5,1);
