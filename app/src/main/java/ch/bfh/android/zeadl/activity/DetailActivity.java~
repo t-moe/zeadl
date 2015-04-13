@@ -85,7 +85,7 @@ public class DetailActivity extends ActionBarActivity {
             });  //*/
 =======
             });
-            
+            */
 >>>>>>> origin/dev_luckk
 
             final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
@@ -133,7 +133,7 @@ public class DetailActivity extends ActionBarActivity {
 
 =======
             });
-            
+            */
 
             //TODO Adrian: Use information from this class to setup ui      -> Thank you!
 
