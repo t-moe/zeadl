@@ -3,10 +3,10 @@
     <string name="action_groups">Select Groups</string>
     <string name="action_exit">Exit</string>
     <string name="local_service_started">Recording Data...</string>
-    <string name="local_service_stopped">Zeadle Service stopped</string>
-    <string name="local_service_connected">Zeadle Service connected</string>
-    <string name="local_service_disconnected">Zeadle Service disconnected</string>
-    <string name="local_service_label">Zeadle Service</string>
+    <string name="local_service_stopped">Zeadl Service stopped</string>
+    <string name="local_service_connected">Zeadl Service connected</string>
+    <string name="local_service_disconnected">Zeadl Service disconnected</string>
+    <string name="local_service_label">Zeadl Service</string>
     <string name="title_activity_detail">Details</string>
     <string name="title_activity_group_select">Select Groups</string>
     <string name="action_settings">Settings</string>
