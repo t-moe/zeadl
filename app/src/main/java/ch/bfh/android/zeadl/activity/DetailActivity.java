@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,7 @@ import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -88,6 +90,7 @@ public class DetailActivity extends ActionBarActivity {
 
             samplerate = group.getSampleRate();
 
+            /*
             Button buttonBack = (Button) findViewById(R.id.buttonBack);
             buttonBack.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -96,6 +99,7 @@ public class DetailActivity extends ActionBarActivity {
                     startActivity(i);
                 }
             });
+            */
 
             final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
             barSamplerate.setMax(group.getMaximalSampleRate());
@@ -133,6 +137,7 @@ public class DetailActivity extends ActionBarActivity {
                 }
             });
 
+            /*
             Button buttonSaveTable = (Button) findViewById(R.id.buttonSaveTable);
             buttonSaveTable.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -145,7 +150,7 @@ public class DetailActivity extends ActionBarActivity {
                     }
                 }
             });
-
+            */
 
             //TODO Adrian: Use information from this class to setup ui      -> Thank you!
 
@@ -165,8 +170,6 @@ public class DetailActivity extends ActionBarActivity {
             //SensorGroup.DataSegment segment = group.getLastDataSegment();
             //segment.getChannels();
             //segment.getEntries();
-
-
         }
 
 
@@ -196,8 +199,6 @@ public class DetailActivity extends ActionBarActivity {
         TableClass tc = new TableClass(table_layout,this,group);
 
         tc.addSegment(group.getLastDataSegment());
-
-
     }
 
 
@@ -216,7 +217,27 @@ public class DetailActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_savegraph) {
+            Log.d("DetailActivity", "Action Save Graph");
+            Toast.makeText(getApplicationContext(),"not implemented yet",Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        if (id == R.id.action_savetable) {
+            FileClass fc = new FileClass();
+            try {
+                fc.saveSegment(group.getLastDataSegment());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d("DetailActivity", "Action Save Table");
+            Toast.makeText(getApplicationContext(),"Table saved",Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        if (id == R.id.action_cleargraph) {
+            Log.d("DetailActivity", "Action Clear Graph");
+            Toast.makeText(getApplicationContext(),"not implemented yet",Toast.LENGTH_SHORT).show();
             return true;
         }
 
