@@ -58,7 +58,7 @@ public class FileClass {
         if(checkExternalStorageWritable()) {
 
             BufferedWriter bfw = new BufferedWriter(new FileWriter("/sdcard/DCIM/Data.txt"));
-            SimpleDateFormat df = new SimpleDateFormat("yyMMddHHmmss.S");
+            SimpleDateFormat df = new SimpleDateFormat("dd hh:mm:ss:SSS");
 
             bfw.write("Time, ");
             for (int i = 0; i < segment.getChannels().size(); i++) {

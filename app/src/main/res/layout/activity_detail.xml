@@ -84,45 +84,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="fill_parent">
 
-                            <RelativeLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal"
-                                android:layout_alignParentLeft="true"
-                                android:layout_alignParentStart="true"
-                                android:layout_alignParentTop="true"
-                                android:id="@+id/relativeLayout"
-                                android:background="#e0e0e0e0">
-
-                                <Button
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Back"
-                                    android:id="@+id/buttonBack"
-                                    android:layout_gravity="left"
-                                    android:nestedScrollingEnabled="true"
-                                    android:focusableInTouchMode="false"
-                                    android:layout_alignParentTop="true"
-                                    android:layout_alignParentRight="true"
-                                    android:layout_alignParentEnd="true" />
-
-                                <Button
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Clear Graph"
-                                    android:id="@+id/buttonClearGraph"
-                                    android:singleLine="false"
-                                    android:layout_alignParentTop="true"
-                                    android:layout_alignParentLeft="true"
-                                    android:layout_alignParentStart="true" />
-
-                            </RelativeLayout>
-
                             <ListView
                                 android:id="@+id/channelList"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/relativeLayout"
                                 android:layout_alignParentLeft="true"
                                 android:layout_alignParentStart="true" />
 
@@ -160,21 +125,6 @@
                                 </TableLayout>
                         </ScrollView>
 
-                        <Button
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Save Table"
-                            android:id="@+id/buttonSaveTable"
-                            android:layout_column="12"
-                            android:layout_gravity="right"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="false"
-                            android:layout_alignParentStart="true"
-                            android:layout_marginLeft="372dp"
-                            android:layout_marginStart="372dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="false" />
-
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -197,16 +147,6 @@
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:id="@+id/layoutChart"></LinearLayout>
-
-                        <Button
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Save Graph"
-                            android:id="@+id/buttonSaveGraph"
-                            android:layout_gravity="right"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentEnd="true" />
 
                     </RelativeLayout>
 
