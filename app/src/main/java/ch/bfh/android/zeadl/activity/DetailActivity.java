@@ -241,6 +241,12 @@ public class DetailActivity extends ActionBarActivity {
             return true;
         }
 
+        if (id == R.id.action_back) {
+            Intent i = new Intent(DetailActivity.this,MainActivity.class);
+            startActivity(i);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }
