@@ -55,6 +55,8 @@ public class SensorChannelSeries extends TimeSeries implements SensorGroup.DataS
             remove(0);
         }
 
-        add(entry.getTime(), entry.getChannelData().get(mChInd));
+        List<Float> entries = entry.getChannelData();
+        if(mChInd>=entries.size()) return;
+        add(entry.getTime(),entries.get(mChInd));
     }
 }
