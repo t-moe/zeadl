@@ -76,7 +76,7 @@ public class FileClass {
 
             bfw.close();
 
-            //Toast.makeText(getActivity(),"Data saved",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Data saved",Toast.LENGTH_SHORT).show();
         }
         //Toast.makeText(getActivity(),"Data not saved, Error",Toast.LENGTH_LONG).show();
 

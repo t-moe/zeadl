@@ -16,6 +16,7 @@ import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -43,26 +44,6 @@ public class DetailActivity extends ActionBarActivity {
     private String[] ChannelNames;
     private SensorGroup group;
 
-    private int samplerate;
-
-    /*
-            int[] data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        final DataClass DatenKlasse = new DataClass("TestDaten",0,10,data);
-
-        Button Buttentest = (Button) findViewById(R.id.mainbutten);
-
-        Buttentest.setText(DatenKlasse.getTitle());
-
-  //*
-        Buttentest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, DetailActivity.class));
-            }
-        });
-     */
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +67,7 @@ public class DetailActivity extends ActionBarActivity {
                 ChannelNames[i] = activeChannels.get(i).getName();
             }
 
-            samplerate = group.getSampleRate();
-
+            /*
             Button buttonBack = (Button) findViewById(R.id.buttonBack);
             buttonBack.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -95,15 +75,15 @@ public class DetailActivity extends ActionBarActivity {
                     Intent i = new Intent(DetailActivity.this,MainActivity.class);
                     startActivity(i);
                 }
-            });
+            });  //*/
 
             final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
             barSamplerate.setMax(group.getMaximalSampleRate());
             barSamplerate.setProgress(group.getSampleRate());
 
             final TextView textViewSamplerate = (TextView)findViewById(R.id.textSamplerate);
-            textViewSamplerate.setText(""+group.getSampleRate());
-            
+            textViewSamplerate.setText(formatSampleRate(group.getSampleRate()));
+
             barSamplerate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -111,8 +91,10 @@ public class DetailActivity extends ActionBarActivity {
                         progress = 1;
                         barSamplerate.setProgress(1);
                     }
-                    group.setSampleRate(progress);
-                    textViewSamplerate.setText("" + progress);
+                    int samplerate = progress;
+
+                    group.setSampleRate(samplerate);
+                    textViewSamplerate.setText(formatSampleRate(samplerate));
                 }
 
                 @Override
@@ -122,17 +104,8 @@ public class DetailActivity extends ActionBarActivity {
                 public void onStopTrackingTouch(SeekBar seekBar) {}
             });
 
-            textViewSamplerate.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    int num = Integer.valueOf(textViewSamplerate.getText().toString());
-                    if(num > group.getMaximalSampleRate()){ num = group.getMaximalSampleRate();}
-                    barSamplerate.setProgress(num);
-                    group.setSampleRate(num);
-                    return false;
-                }
-            });
 
+            /*
             Button buttonSaveTable = (Button) findViewById(R.id.buttonSaveTable);
             buttonSaveTable.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -144,28 +117,7 @@ public class DetailActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
                 }
-            });
-
-
-            //TODO Adrian: Use information from this class to setup ui      -> Thank you!
-
-            //General
-            //String name = group.getName();
-            //String unit = group.getUnit();
-            //int samplerate = group.getSampleRate();
-
-            //Static info about channels
-            //List<SensorChannel> activeChannels = group.getActiveChannels();
-
-            //SensorChannel ch1 = activeChannels.get(0);
-            //ch1.getColor();
-            //ch1.getName();
-
-            //Getting Data
-            //SensorGroup.DataSegment segment = group.getLastDataSegment();
-            //segment.getChannels();
-            //segment.getEntries();
-
+            }); //*/
 
         }
 
@@ -199,6 +151,24 @@ public class DetailActivity extends ActionBarActivity {
 
 
     }
+
+    //*
+    private String formatSampleRate(int samplerate){
+        String val, temp;
+        if(samplerate>=3600){
+            temp = String.format("%1.2f",samplerate/3600.0);
+            val = temp + "/sec";
+        }
+        else if(samplerate>=60){
+            temp = String.format("%2.1f",samplerate/60.0);
+            val = temp + "/min";
+        }
+        else {
+            val = samplerate + "/h";
+        }
+
+        return val;
+    } //*/
 
 
     @Override
