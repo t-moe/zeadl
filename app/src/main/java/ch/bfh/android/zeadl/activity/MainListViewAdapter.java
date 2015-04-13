@@ -72,9 +72,9 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
         int sampleRate= sensorGroup.getSampleRate();
         String sampleRateText;
         if(sampleRate>=3600) {
-            sampleRateText = sampleRate/3600.0 + " Samples/sec";
+            sampleRateText = String.format("%.02f", sampleRate/3600.0) + " Samples/sec";
         } else if( sampleRate>=60) {
-            sampleRateText = sampleRate/60.0 + " Samples/min";
+            sampleRateText = String.format("%.02f",sampleRate/60.0) + " Samples/min";
         } else {
             sampleRateText = sampleRate + " Samples/hour";
         }
@@ -187,6 +187,11 @@ public class MainListViewAdapter extends ArrayAdapter<SensorGroup>
 
     @Override
     public void onSampleRateChanged(SensorGroup.SampleRateChangedEvent event) {
-        //Not needed
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged(); //To update samplerate text TODO: find better way
+            }
+        });
     }
 }

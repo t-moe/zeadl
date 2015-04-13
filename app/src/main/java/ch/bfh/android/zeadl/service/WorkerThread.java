@@ -19,9 +19,12 @@ import ch.bfh.android.zeadl.sensor.SensorGroupController;
  */
 public class WorkerThread extends AsyncTask implements SensorGroupController.UpdateListener, SensorGroup.UpdateListener {
 
+    private Thread mThread;
+
     @Override
     protected Object doInBackground(Object[] params) {
         Log.d("Zeadl Thread","Thread started");
+        mThread = Thread.currentThread();
         SensorGroupController.addEventListener(this);
         List<SensorGroup> activeSensorGroups = SensorGroupController.getActiveGroups();
         for(SensorGroup sensorGroup: activeSensorGroups) {
@@ -59,7 +62,8 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
                             Log.d("worker", "Sample rate " + group.getSampleRate() + " timediff " + milidiff);
                         }*/
 
-                        for (SensorChannel channel : segment.getChannels()) {
+                        for (Iterator<SensorChannel> iterator = segment.getChannels().iterator(); iterator.hasNext(); ) {
+                            SensorChannel channel = iterator.next();
                             datapoints.add(channel.getSample());
                         }
 
@@ -136,6 +140,8 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
 
             Log.d("Zeadl Thread", "New Update Freq: " + mUpdateFreq + " Freqs: " + Arrays.toString(sampleRates));
         }
+        mThread.interrupt(); //force thread to quit sleep
+
     }
 
 

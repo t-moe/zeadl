@@ -31,6 +31,7 @@ public abstract class SensorGroup {
         if(mSampleRate>getMaximalSampleRate()) {
             mSampleRate = getMaximalSampleRate();
         }
+        mDataSegments.add(new DataSegment(this,new ArrayList<SensorChannel>()));
     }
 
     /**
@@ -266,7 +267,7 @@ public abstract class SensorGroup {
 
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
-                final DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                final DataSegment newSegment = new DataSegment(this,new ArrayList<>(mActiveSensorChannels)); //COPY channnels into new datasegment
                 mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
                 mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
@@ -300,7 +301,7 @@ public abstract class SensorGroup {
 
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
-                final DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                final DataSegment newSegment = new DataSegment(this,new ArrayList<>(mActiveSensorChannels)); //COPY channnels into new datasegment
                 mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
                 mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
@@ -332,7 +333,7 @@ public abstract class SensorGroup {
 
         synchronized (mDataSegments) {
             if(!mActiveSensorChannels.isEmpty()) {
-                final DataSegment newSegment = new DataSegment(this,mActiveSensorChannels);
+                final DataSegment newSegment = new DataSegment(this,new ArrayList<>(mActiveSensorChannels)); //COPY channnels into new datasegment
                 mDataSegments.clear(); //Testwise, to save memory. TODO: remove this line
                 mDataSegments.add(newSegment);
                 mListeners.fireEvent(new EventListenerCollection.EventFireHelper<UpdateListener>() {
