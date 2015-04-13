@@ -1,12 +1,17 @@
 package ch.bfh.android.zeadl.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -20,6 +25,7 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -33,6 +39,11 @@ import ch.bfh.android.zeadl.sensor.SensorGroupController;
 public class DetailActivity extends ActionBarActivity {
 
     private TableLayout table_layout;
+    private List<SensorChannel> activeChannels;
+    private String[] ChannelNames;
+    private SensorGroup group;
+
+    private int samplerate;
 
     /*
             int[] data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -60,14 +71,83 @@ public class DetailActivity extends ActionBarActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             int SensorGroupId = extras.getInt("sensorGroupId");
-            SensorGroup group = SensorGroupController.getActiveGroups().get(SensorGroupId);
+            group = SensorGroupController.getActiveGroups().get(SensorGroupId);
 
             final ListView listView= (ListView) findViewById(R.id.channelList);
             final DetailChannelListViewAdapter adapter = new DetailChannelListViewAdapter(this,group);
             listView.setAdapter(adapter);
 
+            activeChannels = group.getActiveChannels();
 
-            //TODO Adrian: Use information from this class to setup ui
+            int chanNum = activeChannels.size();
+            ChannelNames = new String[chanNum];
+
+            for(int i=0;i<chanNum;i++){
+                ChannelNames[i] = activeChannels.get(i).getName();
+            }
+
+            samplerate = group.getSampleRate();
+
+            Button buttonBack = (Button) findViewById(R.id.buttonBack);
+            buttonBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(DetailActivity.this,MainActivity.class);
+                    startActivity(i);
+                }
+            });
+
+            final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
+            barSamplerate.setMax(group.getMaximalSampleRate());
+            barSamplerate.setProgress(group.getSampleRate());
+
+            final TextView textViewSamplerate = (TextView)findViewById(R.id.textSamplerate);
+            textViewSamplerate.setText(""+group.getSampleRate());
+            
+            barSamplerate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if(progress==0){
+                        progress = 1;
+                        barSamplerate.setProgress(1);
+                    }
+                    group.setSampleRate(progress);
+                    textViewSamplerate.setText("" + progress);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+
+            textViewSamplerate.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    int num = Integer.valueOf(textViewSamplerate.getText().toString());
+                    if(num > group.getMaximalSampleRate()){ num = group.getMaximalSampleRate();}
+                    barSamplerate.setProgress(num);
+                    group.setSampleRate(num);
+                    return false;
+                }
+            });
+
+            Button buttonSaveTable = (Button) findViewById(R.id.buttonSaveTable);
+            buttonSaveTable.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FileClass fc = new FileClass();
+                    try {
+                        fc.saveSegment(group.getLastDataSegment());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+
+            //TODO Adrian: Use information from this class to setup ui      -> Thank you!
 
             //General
             //String name = group.getName();
@@ -112,38 +192,10 @@ public class DetailActivity extends ActionBarActivity {
 
         // Add Table
 
-        TableRow row = new TableRow(this);
-        TableRow anotherRow = new TableRow(this);
-
-        row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
-        row.setPadding(0,1,0,1);
-        anotherRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
-        anotherRow.setPadding(0,1,0,1);
-
-        TextView tv = new TextView(this);
-        TextView tv2 = new TextView(this);
-        tv.setText("Column 1  ");
-        tv2.setText("Column 2  ");
-
-
-        TextView tvCH1 = (TextView)findViewById(R.id.labelChannel1);
-        tvCH1.setText("Hallo");
-
-
-
-
-
-        row.addView(tv);
-        row.addView(tv2);
-        //row.addView();
-
-
         table_layout = (TableLayout) findViewById(R.id.TableData);
-        table_layout.addView(row);
+        TableClass tc = new TableClass(table_layout,this,group);
 
-
-
-
+        tc.addSegment(group.getLastDataSegment());
 
 
     }
