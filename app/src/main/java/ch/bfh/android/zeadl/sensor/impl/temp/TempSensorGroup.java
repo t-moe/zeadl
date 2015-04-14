@@ -13,7 +13,7 @@ import ch.bfh.android.zeadl.sensor.SensorGroup;
 @DisplayName("Temperature Sensor")
 public class TempSensorGroup  extends SensorGroup {
     public TempSensorGroup() {
-        setSampleRate(getMaximalSampleRate());
+        setSampleRate(3600);
 
         if(!Build.FINGERPRINT.startsWith("generic")) { //not in emulator
            // addChannel(new I2CTempChannel());

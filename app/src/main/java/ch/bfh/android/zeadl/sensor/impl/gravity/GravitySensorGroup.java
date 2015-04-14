@@ -10,7 +10,7 @@ import ch.bfh.android.zeadl.sensor.SensorGroup;
 @DisplayName("Gravity Sensor")
 public class GravitySensorGroup extends SensorGroup {
     public GravitySensorGroup() {
-        setSampleRate(getMaximalSampleRate());
+        setSampleRate(3600);
         addChannel(new I2CGSensChannelX());
         addChannel(new I2CGSensChannelY());
         addChannel(new I2CGSensChannelZ());

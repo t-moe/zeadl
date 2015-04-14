@@ -255,7 +255,7 @@ public class DetailActivity extends ActionBarActivity {
         v.draw(c);
 
         try {
-            String filename= "/sdcard/DCIM/Graph"+System.currentTimeMillis()+".jpg";
+            String filename= "/sdcard/DCIM/ZeadlGraph"+System.currentTimeMillis()+".jpg";
             FileOutputStream output = new FileOutputStream(filename);
 
             // Compress into png format image from 0% - 100%
@@ -277,7 +277,7 @@ public class DetailActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
-        Toast.makeText(getApplicationContext(),"Graph saved to gallery",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),"Graph saved to gallery",Toast.LENGTH_LONG).show();
     }
 
     private String formatSampleRate(int samplerate){
@@ -322,12 +322,12 @@ public class DetailActivity extends ActionBarActivity {
         if (id == R.id.action_savetable) {
             FileClass fc = new FileClass();
             try {
-                fc.saveSegment(group.getLastDataSegment());
+                String filename = fc.saveSegment(group.getLastDataSegment());
+                Toast.makeText(getApplicationContext(),"Table saved to "+filename,Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             Log.d("DetailActivity", "Action Save Table");
-            Toast.makeText(getApplicationContext(),"Table saved",Toast.LENGTH_SHORT).show();
             return true;
         }
 

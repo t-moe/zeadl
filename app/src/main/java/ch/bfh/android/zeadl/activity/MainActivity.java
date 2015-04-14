@@ -11,6 +11,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ch.bfh.android.zeadl.R;
+import ch.bfh.android.zeadl.sensor.SensorGroup;
+import ch.bfh.android.zeadl.sensor.SensorGroupController;
 import ch.bfh.android.zeadl.service.ServiceHelper;
 
 
@@ -97,6 +99,7 @@ public class MainActivity extends ActionBarActivity {
             case R.id.action_exit:
                 serviceHelper.Stop();
                 this.finish();
+                SensorGroupController.clearAllData();
                 return true;
             case R.id.action_groups:
                 startActivity(new Intent(this,GroupSelectActivity.class));

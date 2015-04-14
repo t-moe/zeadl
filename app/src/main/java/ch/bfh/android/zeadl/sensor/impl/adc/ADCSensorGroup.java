@@ -10,7 +10,7 @@ import ch.bfh.android.zeadl.sensor.SensorGroup;
 public class ADCSensorGroup extends SensorGroup {
 
     public ADCSensorGroup() {
-        setSampleRate(getMaximalSampleRate());
+        setSampleRate(3600);
         addChannel(new FsAdcChannel(FsAdcChannel.ADCChannelSrc.ADC0));
         addChannel(new FsAdcChannel(FsAdcChannel.ADCChannelSrc.ADC1));
         addChannel(new FsAdcChannel(FsAdcChannel.ADCChannelSrc.ADC2));

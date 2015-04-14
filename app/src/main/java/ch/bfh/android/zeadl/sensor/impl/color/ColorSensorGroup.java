@@ -11,7 +11,7 @@ import ch.bfh.android.zeadl.sensor.SensorGroup;
 public class ColorSensorGroup extends SensorGroup {
 
     public ColorSensorGroup() {
-        setSampleRate(getMaximalSampleRate());
+        setSampleRate(3600);
 
         // Create a new Sensor instance
         I2CColorSensor Sensor = new I2CColorSensor();
@@ -23,7 +23,7 @@ public class ColorSensorGroup extends SensorGroup {
     }
 
     public String getUnit() {
-        return "Candela??";
+        return "Candela"; //Not sure here
     }
 
     public int getMaximalSampleRate() {
