@@ -33,54 +33,55 @@
                     android:layout_height="fill_parent"
                     android:orientation="vertical">
 
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="45dp">
+
+                        <RelativeLayout
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:text="Samplerate"
+                                android:id="@+id/IndicatorSamplerate"
+                                android:layout_gravity="center_vertical"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentRight="false" />
+
+                            <SeekBar
+                                android:layout_width="350dp"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/barSamplerate"
+                                android:layout_weight="0.13"
+                                android:layout_gravity="center_vertical"
+                                android:max="1000"
+                                android:layout_centerVertical="true"
+                                android:layout_toRightOf="@+id/IndicatorSamplerate"
+                                android:layout_toLeftOf="@+id/textSamplerate"
+                                android:layout_toStartOf="@+id/textSamplerate" />
+
+                            <TextView
+                                android:layout_width="160dp"
+                                android:layout_height="fill_parent"
+                                android:textAppearance="?android:attr/textAppearanceLarge"
+                                android:id="@+id/textSamplerate"
+                                android:layout_gravity="right"
+                                android:layout_alignTop="@+id/barSamplerate"
+                                android:layout_alignParentRight="true"
+                                android:layout_alignParentEnd="false" />
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
-
-                        <RelativeLayout
-                            android:layout_width="fill_parent"
-                            android:layout_height="45dp">
-
-                            <RelativeLayout
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textAppearance="?android:attr/textAppearanceMedium"
-                                    android:text="Samplerate"
-                                    android:id="@+id/IndicatorSamplerate"
-                                    android:layout_gravity="center_vertical"
-                                    android:layout_centerVertical="true"
-                                    android:layout_alignParentLeft="true"
-                                    android:layout_alignParentStart="true" />
-
-                                <SeekBar
-                                    android:layout_width="250dp"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/barSamplerate"
-                                    android:layout_weight="0.13"
-                                    android:layout_gravity="center_vertical"
-                                    android:max="1000"
-                                    android:layout_centerVertical="true"
-                                    android:layout_toRightOf="@+id/IndicatorSamplerate" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="fill_parent"
-                                    android:textAppearance="?android:attr/textAppearanceLarge"
-                                    android:id="@+id/textSamplerate"
-                                    android:layout_gravity="right"
-                                    android:layout_alignTop="@+id/barSamplerate"
-                                    android:layout_alignParentRight="true"
-                                    android:layout_alignParentEnd="true"
-                                    android:layout_toRightOf="@+id/barSamplerate"
-                                    android:layout_toEndOf="@+id/barSamplerate" />
-                            </RelativeLayout>
-
-                        </RelativeLayout>
 
                         <RelativeLayout
                             android:layout_width="match_parent"
