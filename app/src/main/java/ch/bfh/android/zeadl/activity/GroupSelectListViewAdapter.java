@@ -55,7 +55,9 @@ public class GroupSelectListViewAdapter extends ArrayAdapter<SensorGroupControll
                     if(group.getActiveChannels().isEmpty()) {
                         for (SensorGroup.ChannelInfo channelInfo : group.getAvailableChannels()) {
                             SensorChannel channel = group.activate(channelInfo);
-                            channel.setColor(Color.argb(255, (int) Math.round(Math.random() * 255f), (int) Math.round(Math.random() * 255f), (int) Math.round(Math.random() * 255f)));
+                            if (channel.getColor() == Color.WHITE) {
+                                channel.setColor(Color.argb(255, (int) Math.round(Math.random() * 255f), (int) Math.round(Math.random() * 255f), (int) Math.round(Math.random() * 255f)));
+                            }
                         }
                     }
                 } else {

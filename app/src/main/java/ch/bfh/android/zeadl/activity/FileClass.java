@@ -51,13 +51,15 @@ public class FileClass {
         return file;
     }
 
+    private final String mFilenameBase = "/sdcard/DCIM/ZeadlData";
 
-    public void saveSegment(SensorGroup.DataSegment segment) throws IOException
+
+
+    public String saveSegment(SensorGroup.DataSegment segment) throws IOException
     {
-
         if(checkExternalStorageWritable()) {
-
-            BufferedWriter bfw = new BufferedWriter(new FileWriter("/sdcard/DCIM/Data.txt"));
+            String filename = mFilenameBase + System.currentTimeMillis()+".txt";
+            BufferedWriter bfw = new BufferedWriter(new FileWriter(filename));
             SimpleDateFormat df = new SimpleDateFormat("dd hh:mm:ss:SSS");
 
             bfw.write("Time, ");
@@ -75,11 +77,9 @@ public class FileClass {
             }
 
             bfw.close();
-
-            //Toast.makeText(getApplicationContext(),"Data saved",Toast.LENGTH_SHORT).show();
+            return filename;
         }
-        //Toast.makeText(getActivity(),"Data not saved, Error",Toast.LENGTH_LONG).show();
-
+        return "";
     }
 
 

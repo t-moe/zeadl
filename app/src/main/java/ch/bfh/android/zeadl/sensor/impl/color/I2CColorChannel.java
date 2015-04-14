@@ -1,5 +1,7 @@
 package ch.bfh.android.zeadl.sensor.impl.color;
 
+import android.graphics.Color;
+
 import java.nio.ByteBuffer;
 
 import ch.bfh.android.zeadl.sensor.SensorChannel;
@@ -41,22 +43,27 @@ public class I2CColorChannel extends SensorChannel {
             case GREEN:
                 COL_REG_L = TCS3414_GL_REG;
                 COL_REG_H = TCS3414_GH_REG;
+                setColor(Color.GREEN);
                 break;
             case BLUE:
                 COL_REG_L = TCS3414_BL_REG;
                 COL_REG_H = TCS3414_BH_REG;
+                setColor(Color.BLUE);
                 break;
             case RED:
                 COL_REG_L = TCS3414_RL_REG;
                 COL_REG_H = TCS3414_RH_REG;
+                setColor(Color.RED);
                 break;
             case CLEAR:
                 COL_REG_L = TCS3414_CL_REG;
                 COL_REG_H = TCS3414_CH_REG;
+                setColor(Color.BLACK);
                 break;
             default:
                 COL_REG_L = TCS3414_CL_REG;
                 COL_REG_H = TCS3414_CH_REG;
+                setColor(Color.BLACK);
                 break;
         }
     }

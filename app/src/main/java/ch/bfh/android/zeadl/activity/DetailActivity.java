@@ -1,35 +1,26 @@
 package ch.bfh.android.zeadl.activity;
 
-import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TabHost;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
 import org.achartengine.model.TimeSeries;
@@ -37,15 +28,10 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import ch.bfh.android.zeadl.R;
 import ch.bfh.android.zeadl.sensor.SensorChannel;
@@ -55,14 +41,15 @@ import ch.bfh.android.zeadl.sensor.SensorGroupController;
 
 public class DetailActivity extends ActionBarActivity {
 
-    private TableLayout table_layout;
     private List<SensorChannel> activeChannels;
     private String[] ChannelNames;
     private SensorGroup group;
     private SensorGroup.UpdateListener mUpdateListener = null;
+    final private int barMaxValue = 1000;
+    private int samplerate;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
@@ -105,11 +92,14 @@ public class DetailActivity extends ActionBarActivity {
             group.addEventListener(mUpdateListener);
 
             final SeekBar barSamplerate = (SeekBar) findViewById(R.id.barSamplerate);
-            barSamplerate.setMax(group.getMaximalSampleRate());
-            barSamplerate.setProgress(group.getSampleRate());
+    //        barSamplerate.setMax(group.getMaximalSampleRate());
+            barSamplerate.setMax(barMaxValue);
+            barSamplerate.setProgress((int)(barMaxValue * Math.log(group.getSampleRate())
+                                        / Math.log(group.getMaximalSampleRate())));
 
             final TextView textViewSamplerate = (TextView)findViewById(R.id.textSamplerate);
             textViewSamplerate.setText(formatSampleRate(group.getSampleRate()));
+
 
             barSamplerate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -118,17 +108,27 @@ public class DetailActivity extends ActionBarActivity {
                         progress = 1;
                         barSamplerate.setProgress(1);
                     }
-                    int samplerate = progress;
 
-                    group.setSampleRate(samplerate);
-                    textViewSamplerate.setText(formatSampleRate(samplerate));
+                    double val;
+
+                    val = Math.pow((double)group.getMaximalSampleRate(),((((double)progress)+1)/ (barMaxValue)));
+
+                    int samplerate_t = (int)(val);
+
+                    if(samplerate_t>group.getMaximalSampleRate()){
+                        samplerate_t=group.getMaximalSampleRate();
+                    }
+    //              int samplerate = progress;
+
+                    samplerate = samplerate_t;
+                    textViewSamplerate.setText(formatSampleRate(samplerate_t));
                 }
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {}
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
+                public void onStopTrackingTouch(SeekBar seekBar) {group.setSampleRate(samplerate);}
             });
         }
 
@@ -151,12 +151,17 @@ public class DetailActivity extends ActionBarActivity {
         tabspec.setIndicator("Settings");
         tabHost.addTab(tabspec);
 
-        // Add Table
-
-        table_layout = (TableLayout) findViewById(R.id.TableData);
-        TableClass tc = new TableClass(table_layout,this,group);
-
-        tc.addSegment(group.getLastDataSegment());
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                if(tabId.equals("Table")) {
+                    TableLayout table_layout = (TableLayout) findViewById(R.id.TableData);
+                    table_layout.removeAllViews();
+                    TableClass tc = new TableClass(table_layout,DetailActivity.this,group);
+                    tc.addSegment(group.getLastDataSegment());
+                }
+            }
+        });
     }
 
     @Override
@@ -254,7 +259,7 @@ public class DetailActivity extends ActionBarActivity {
         v.draw(c);
 
         try {
-            String filename= "/sdcard/DCIM/Graph"+System.currentTimeMillis()+".jpg";
+            String filename= "/sdcard/DCIM/ZeadlGraph"+System.currentTimeMillis()+".jpg";
             FileOutputStream output = new FileOutputStream(filename);
 
             // Compress into png format image from 0% - 100%
@@ -276,7 +281,7 @@ public class DetailActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
-        Toast.makeText(getApplicationContext(),"Graph saved to gallery",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),"Graph saved to gallery",Toast.LENGTH_LONG).show();
     }
 
     private String formatSampleRate(int samplerate){
@@ -321,18 +326,19 @@ public class DetailActivity extends ActionBarActivity {
         if (id == R.id.action_savetable) {
             FileClass fc = new FileClass();
             try {
-                fc.saveSegment(group.getLastDataSegment());
+                String filename = fc.saveSegment(group.getLastDataSegment());
+                Toast.makeText(getApplicationContext(),"Table saved to "+filename,Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             Log.d("DetailActivity", "Action Save Table");
-            Toast.makeText(getApplicationContext(),"Table saved",Toast.LENGTH_SHORT).show();
             return true;
         }
 
         if (id == R.id.action_cleargraph) {
             Log.d("DetailActivity", "Action Clear Graph");
             group.clearAllDataSegments();
+            ((TableLayout)findViewById(R.id.TableData)).removeAllViews();
             Toast.makeText(getApplicationContext(),"All Data removed",Toast.LENGTH_SHORT).show();
             return true;
         }

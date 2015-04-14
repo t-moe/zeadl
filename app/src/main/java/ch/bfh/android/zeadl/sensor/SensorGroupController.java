@@ -3,6 +3,7 @@ package ch.bfh.android.zeadl.sensor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventListener;
+import java.util.Iterator;
 import java.util.List;
 
 import ch.bfh.android.zeadl.sensor.impl.adc.ADCSensorGroup;
@@ -142,6 +143,15 @@ public final class SensorGroupController {
             }
         });
         return true;
+    }
+
+    public static final void clearAllData() {
+        for (Iterator<GroupInfo> iterator = mSensorGroups.iterator(); iterator.hasNext(); ) {
+            GroupInfo sensorGroup = iterator.next();
+            if(sensorGroup.getInstance()!=null) {
+                sensorGroup.getInstance().clearAllDataSegments();
+            }
+        }
     }
 
     /**
