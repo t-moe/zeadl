@@ -42,7 +42,7 @@ Note: High sample rates will generate a high load on the device. You'll run out 
 - Emulator: Uncomment jni build.gradle file in the app folder. Uncomment all SensorChannels that use the I2C class. Alternative: Use the ARM-Emulator which supports our jni libs.
 
 ##How to Extend
-- Sublass SensorGroup and SensorChannel.
+- Subclass SensorGroup and SensorChannel.
 - The sensor groups has to instantiate all your SensorChannel instances.
 
 
