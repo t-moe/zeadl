@@ -2,7 +2,7 @@
 A project for the embedded android module at bfh.
 
 ##Description: 
-ZEADL is a Datalogger for Android Devices. It offers the possibility to measure several values and show them in a handy graph view, or a table. If necessary, the table and the graph can be safed on your device for further utilisation.
+ZEADL is a Datalogger for Android Devices. It offers the possibility to measure several values and show them in a handy graph view, or a table. If necessary, the table and the graph can be saved on your device for further utilisation.
 
 ##### Contributors:
 * maad
@@ -38,12 +38,16 @@ The last tab shows the settings of the channel data. The first element ist the s
 Note: High sample rates will generate a high load on the device. You'll run out of memory eventually.
 
 ##How to Install
-
+- Beagle bone: Use the provided apk
+- Emulator: Uncomment jni build.gradle file in the app folder. Uncomment all SensorChannels that use the I2C class. Alternative: Use the ARM-Emulator which supports our jni libs.
 
 ##How to Extend
+- Sublass SensorGroup and SensorChannel.
+- The sensor groups has to instantiate all your SensorChannel instances.
 
 
 ##Tipps'n Tricks
+- Zeadl runs as service until you terminate it via Menu->Exit
 
 
 ##Known Issues
