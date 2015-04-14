@@ -41,7 +41,6 @@ import ch.bfh.android.zeadl.sensor.SensorGroupController;
 
 public class DetailActivity extends ActionBarActivity {
 
-    private TableLayout table_layout;
     private List<SensorChannel> activeChannels;
     private String[] ChannelNames;
     private SensorGroup group;
@@ -152,12 +151,17 @@ public class DetailActivity extends ActionBarActivity {
         tabspec.setIndicator("Settings");
         tabHost.addTab(tabspec);
 
-        // Add Table
-
-        table_layout = (TableLayout) findViewById(R.id.TableData);
-        TableClass tc = new TableClass(table_layout,this,group);
-
-        tc.addSegment(group.getLastDataSegment());
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                if(tabId.equals("Table")) {
+                    TableLayout table_layout = (TableLayout) findViewById(R.id.TableData);
+                    table_layout.removeAllViews();
+                    TableClass tc = new TableClass(table_layout,DetailActivity.this,group);
+                    tc.addSegment(group.getLastDataSegment());
+                }
+            }
+        });
     }
 
     @Override
@@ -334,6 +338,7 @@ public class DetailActivity extends ActionBarActivity {
         if (id == R.id.action_cleargraph) {
             Log.d("DetailActivity", "Action Clear Graph");
             group.clearAllDataSegments();
+            ((TableLayout)findViewById(R.id.TableData)).removeAllViews();
             Toast.makeText(getApplicationContext(),"All Data removed",Toast.LENGTH_SHORT).show();
             return true;
         }
