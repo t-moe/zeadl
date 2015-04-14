@@ -20,6 +20,6 @@ public class DummyGroup extends SensorGroup {
     }
 
     public int getMaximalSampleRate() {
-        return 3600/5; //1 sample every 5 secs;
+        return 3600/2; //1 sample every 2 secs;
     }
 }

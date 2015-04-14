@@ -31,6 +31,6 @@ public class TempSensorGroup  extends SensorGroup {
 
     @Override
     public int getMaximalSampleRate() {
-        return 3600*3; //3 samples per sec
+        return 3600*1; //1 samples per sec
     }
 }

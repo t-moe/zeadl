@@ -40,7 +40,7 @@ public abstract class SensorChannel {
     public abstract float getSample();
 
 
-    private int mColor = Color.CYAN;
+    private int mColor = Color.WHITE;
 
     /**
      * Returns the current rendering Color of the channel
