@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ch.bfh.android.zeadl.activity.DetailActivity">
+    <item android:id="@+id/action_savegraph" android:title="Save Graph"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_savetable" android:title="Save Table"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_cleargraph" android:title="Clear Data"
+        android:orderInCategory="100" app:showAsAction="never" />
+</menu>

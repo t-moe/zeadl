@@ -10,6 +10,7 @@
  *
  * \remark  Last Modifications:
  * \remark  V1.0, AOM1, 06.03.2014
+ * \remark V2.0 langt1 8.3.2015
  ***************************************************************************
  */
 
@@ -33,9 +34,6 @@
 
 #include "ch_bfh_android_zeadl_I2C.h"
 
-/* Define if we use the emulator */
-#undef EMULATOR
-
 #define JNIEXPORT __attribute__ ((visibility ("default")))
 
 /* Define Log macros */
@@ -43,202 +41,150 @@
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
-/************************************************************************************************************************************/
-/* Open the i2c device
-/************************************************************************************************************************************/
+/********************************************************************************************************************************/
 
-JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_open(JNIEnv *env, jobject obj, jstring file)
-  {
-   #ifndef EMULATOR
+JNIEXPORT jboolean JNICALL Java_ch_bfh_android_zeadl_I2C_open(JNIEnv *env, jobject that)
+{
+    //Get the necessary field form the instance
+    jclass jclass_i2c = (*env)->GetObjectClass(env, that);
 
-   /* File descriptor to i2c-dev */
-   int i2c_fd;
+    jfieldID jfield_devicename=(*env)->GetFieldID(env,jclass_i2c, "mDeviceName" , "Ljava/lang/String;");
+    jfieldID jfield_i2cadress= (*env)->GetFieldID(env,jclass_i2c, "mI2CAdress" , "I");
+    jfieldID jfield_filehandle= (*env)->GetFieldID(env,jclass_i2c, "mFileHandle" , "I");
 
-   char fileName[64];
-   const jbyte *str;
+    jstring jstr_devicename = (*env)->GetObjectField(env, that, jfield_devicename);
+    jint jint_i2cadress = (*env)->GetIntField(env,that,jfield_i2cadress);
 
-   /* Get device file name */
-   str = (*env)->GetStringUTFChars(env, file, NULL);
-   if (str == NULL)
-    {
-     LOGE("Can't get file name!");
-     return -1;
-    }
+    const char* devicename = (*env)->GetStringUTFChars(env,jstr_devicename, 0);
 
-   /* Get the device file name */
-   sprintf(fileName, "%s", str);
-   LOGI("Open i2c device node %s", fileName);
-   (*env)->ReleaseStringUTFChars(env, file, str);
-
-   i2c_fd = open(fileName, O_RDWR);
-   if(i2c_fd<0) {
-        LOGE("I2C: Can't open device node %s. %s",fileName,strerror(errno));
+    //Try to open the device
+    int i2c_fd = open(devicename, O_RDWR);
+    if(i2c_fd<0) {
+        LOGE("I2C: Can't open device node %s. %s",devicename,strerror(errno));
+        (*env)->ReleaseStringUTFChars(env,jstr_devicename, devicename);
+        (*env)->SetIntField(env,that,jfield_filehandle,-1);
         return 0;
-   }
-   return (jint) i2c_fd;
-   #else
-    return 0;
-   #endif
-  }
-
-/************************************************************************************************************************************/
-/* Set the i2c slave address																										*/
-/************************************************************************************************************************************/
-
-JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_SetSlaveAddress(JNIEnv *env, jobject obj, jint file, jint slaveAddr)
-  {
-   #ifndef EMULATOR
-
-   int res = 0;
-
-   /* Set the I2C slave address for all subsequent I2C device transfers */
-   res = ioctl(file, I2C_SLAVE, slaveAddr);
-   if (res != 0)
-    {
-     LOGE("I2C: Can't set slave address! %s",strerror(errno));
-     return -1;
     }
-   else
+
+    (*env)->ReleaseStringUTFChars(env,jstr_devicename, devicename);
+
+    //Try to set the slave adress
+    int res = ioctl(i2c_fd, I2C_SLAVE, jint_i2cadress);
+    if (res != 0)
     {
-	 /* Inform user about successful result */
-	 LOGI("I2C: Set slave address %x", slaveAddr);
-	 return 0;
+        LOGE("I2C: Can't set slave address! %s",strerror(errno));
+        (*env)->SetIntField(env,that,jfield_filehandle,-1);
+        return 0;
     }
-   #else
-    return 0;
-   #endif
-  }
+    (*env)->SetIntField(env,that,jfield_filehandle,i2c_fd);
+     LOGI("I2C: Device opened. Dev: %d, Addr: 0x%x",i2c_fd,jint_i2cadress);
 
+    return 1;
+}
 
-/************************************************************************************************************************************/
-/* Read from the i2c device																											*/
-/************************************************************************************************************************************/
+JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_read(JNIEnv * env, jobject that, jbyteArray arr, jint count)
+{
+    //Get the necessary field form the instance
+    jclass jclass_i2c = (*env)->GetObjectClass(env, that);
 
-JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_read(JNIEnv * env, jobject obj, jint fileHander, jintArray bufArray, jint len)
+    jfieldID jfield_filehandle= (*env)->GetFieldID(env,jclass_i2c, "mFileHandle" , "I");
+    jint jint_filehandle = (*env)->GetIntField(env,that,jfield_filehandle);
 
-  {
-   #ifndef EMULATOR
+    //Checks
+    if(jint_filehandle < 0) {
+        LOGE("I2C: Device not opened?");
+        return -1;
+    }
 
-    jint *bufInt;
-    char *bufByte;
-    char bytesRead = 0;
-    int  i=0;
+    if (count <= 0)
+    {
+  	    LOGE("I2C: array size <= 0");
+        return -1;
+    }
 
-    /* Check for a valid array size */
-    if (len <= 0)
-     {
-  	  LOGE("I2C: array size <= 0");
-      return -1;
-     }
-
-    /* Allocate the necessary buffers */
-    bufInt = (jint *) malloc(len * sizeof(int));
-    if (bufInt == 0)
-     {
-      LOGE("I2C: Out of memory!");
-      goto err0;
-     }
-    bufByte = (char*) malloc(len);
+    //Buffer allocation
+    char* bufByte = malloc(count);
     if (bufByte == 0)
-     {
-      LOGE("I2C: Out of memory!");
-      goto err1;
-     }
+    {
+        LOGE("I2C: Out of memory!");
+        return -1;
+    }
+    memset(bufByte, '\0', count);
 
-    (*env)->GetIntArrayRegion(env, bufArray, 0, len, bufInt);
 
-    /* Clear the i2c buffer */
-    memset(bufByte, '\0', len);
-    if ((bytesRead = read(fileHander, bufByte, len)) != len)
-     {
-      LOGE("I2C read failed! %s",strerror(errno));
-      goto err2;
-     }
+    //Reading
+    char bytesRead;
+    if ((bytesRead = read(jint_filehandle, bufByte, count)) != count)
+    {
+        LOGE("I2C read failed! %s",strerror(errno));
+        free(bufByte);
+        return -1;
+    }
     else
-     {
-      /* Copy the i2c data elements to the Java array */
-      for (i=0; i<bytesRead ; i++)
-       bufInt[i] = bufByte[i];
-      (*env)->SetIntArrayRegion(env, bufArray, 0, len, bufInt);
-  }
-  /* Cleanup and return number of bytes read */
-  free(bufByte);
-  free(bufInt);
-  return bytesRead;
+    {
+        //LOGI("I2C: using dev %d, received %d bytes ",jint_filehandle,bytesRead);
+        //LOGI("I2C: first two bytes are: 0x%x%x ",bufByte[0],bufByte[1]);
+        (*env)->SetByteArrayRegion(env, arr, 0, count, bufByte);
+    }
+    free(bufByte);
+    return count;
+}
 
-err2:
-  free(bufByte);
-err1:
-  free(bufInt);
-err0:
-  return -1;
 
-   #else
-    return 0;
-   #endif
-  }
+JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_write(JNIEnv * env, jobject that, jbyteArray arr, jint count) {
+    //Get the necessary field form the instance
+    jclass jclass_i2c = (*env)->GetObjectClass(env, that);
 
-/************************************************************************************************************************************/
-/* Write to the i2c device																											*/
-/************************************************************************************************************************************/
+    jfieldID jfield_filehandle= (*env)->GetFieldID(env,jclass_i2c, "mFileHandle" , "I");
+    jint jint_filehandle = (*env)->GetIntField(env,that,jfield_filehandle);
 
-JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_write(JNIEnv *env, jobject obj, jint fileHander, jintArray inJNIArray, jint len)
- {
-  #ifndef EMULATOR
+    //Checks
+    if ((count <= 0) || (count > 255))
+    {
+        LOGE("I2C: array size <= 0 | > 255");
+        return -1;
+    }
 
-  jbyte *bytePtr;
-  jbyte i2cCommBuffer[255];
-  jint  i, bytesWritten;
+    if(jint_filehandle < 0) {
+        LOGE("I2C: Device not opened?");
+        return -1;
+    }
 
-  /* Check for a valid array size */
-  if ((len <= 0) || (len > 255))
-   {
-	LOGE("I2C: array size <= 0 | > 255");
-    return -1;
-   }
+    jbyte * byteArr = (*env)->GetByteArrayElements(env, arr, NULL);
 
-  /* Convert the incoming JNI jbyteArray to C's jbyte[] */
-  jint *inCArray = (*env)->GetIntArrayElements(env, inJNIArray, NULL);
+    if (byteArr==NULL) return 0;
 
-  /* Return on error */
-  if (NULL == inCArray)
-   return (jint) NULL;
+    jsize arrsize = (*env)->GetArrayLength(env, arr);
+    if(arrsize<count) {
+        LOGE("I2C: not enough elements in array");
+        (*env)->ReleaseByteArrayElements(env, arr, byteArr, 0);
+        return -1;
+    }
 
-  /* Get the array length */
-  jsize length = (*env)->GetArrayLength(env, inJNIArray);
+    //Writing
+    int bytesWritten = write(jint_filehandle, byteArr, count);
+    if (bytesWritten != count)
+    {
+        LOGE("Write to the i2c device failed! %s",strerror(errno));
+        (*env)->ReleaseByteArrayElements(env, arr, byteArr, 0);
+        return -1;
+    }
 
-  /* Get the i2c data elements from the java array*/
-  for (i=0; i<length; i++)
-   {
-	i2cCommBuffer[i] = (jbyte) inCArray[i];
-   }
+    //LOGI("I2C: using dev %d, wrote %d bytes ",jint_filehandle,bytesWritten);
+    //LOGI("I2C: first two bytes are: 0x%x%x ",byteArr[0],byteArr[1]);
 
-  /* Release resources */
-  (*env)->ReleaseIntArrayElements(env, inJNIArray, inCArray, 0);
+    (*env)->ReleaseByteArrayElements(env, arr, byteArr, 0);
+    return bytesWritten;
+}
 
-  /* Write data to the i2c device */
-  bytesWritten = write(fileHander, i2cCommBuffer, len);
+JNIEXPORT void JNICALL Java_ch_bfh_android_zeadl_I2C_close(JNIEnv * env, jobject that)
+{
+    //Get the necessary field form the instance
+    jclass jclass_i2c = (*env)->GetObjectClass(env, that);
+    jfieldID jfield_filehandle= (*env)->GetFieldID(env,jclass_i2c, "mFileHandle" , "I");
+    jint jint_filehandle = (*env)->GetIntField(env,that,jfield_filehandle);
 
-  /* Inform user if not all bytes are written */
-  if (bytesWritten != len)
-   {
-    LOGE("Write to the i2c device failed! %s",strerror(errno));
-    return -1;
-   }
-  return bytesWritten;
+    close(jint_filehandle);
 
-  #else
-   return 0;
-  #endif
- }
-
-/************************************************************************************************************************************/
-/* Close the i2c interface																										    */
-/************************************************************************************************************************************/
-
-JNIEXPORT void JNICALL Java_ch_bfh_android_zeadl_I2C_close(JNIEnv *env, jobject obj, jint fileHander)
- {
-   #ifndef EMULATOR
-    close(fileHander);
-   #endif
- }
+    (*env)->SetIntField(env,that,jfield_filehandle,-1);
+}

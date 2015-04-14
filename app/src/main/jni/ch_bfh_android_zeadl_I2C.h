@@ -10,42 +10,34 @@ extern "C" {
 /*
  * Class:     ch_bfh_android_zeadl_I2C
  * Method:    open
- * Signature: (Ljava/lang/String;)I
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_open
-  (JNIEnv *, jobject, jstring);
-
-/*
- * Class:     ch_bfh_android_zeadl_I2C
- * Method:    SetSlaveAddress
- * Signature: (II)I
- */
-JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_SetSlaveAddress
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jboolean JNICALL Java_ch_bfh_android_zeadl_I2C_open
+  (JNIEnv *, jobject);
 
 /*
  * Class:     ch_bfh_android_zeadl_I2C
  * Method:    read
- * Signature: (I[II)I
+ * Signature: ([BI)I
  */
 JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_read
-  (JNIEnv *, jobject, jint, jintArray, jint);
+  (JNIEnv *, jobject, jbyteArray, jint);
 
 /*
  * Class:     ch_bfh_android_zeadl_I2C
  * Method:    write
- * Signature: (I[II)I
+ * Signature: ([BI)I
  */
 JNIEXPORT jint JNICALL Java_ch_bfh_android_zeadl_I2C_write
-  (JNIEnv *, jobject, jint, jintArray, jint);
+  (JNIEnv *, jobject, jbyteArray, jint);
 
 /*
  * Class:     ch_bfh_android_zeadl_I2C
  * Method:    close
- * Signature: (I)V
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_ch_bfh_android_zeadl_I2C_close
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }
