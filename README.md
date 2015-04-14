@@ -24,7 +24,7 @@ Note: The app is not fully terminated if you press the "back" button multiple ti
 
 ##Detail View
 ###Graph
-At the Graph you see the actual measurements by graph. If you like to save the current view, press "Save Graph" in the menu in the top right corner. If you want to clear the actual view, tipe "Clear Data" in the same menu.
+In the Graph you see the actual measurements by channel. You can zoom and pan the Graph. If you like to save the current view, press "Save Graph" in the menu in the top right corner. If you want to clear the actual view, tipe "Clear Data" in the same menu.
 
 ###Table
 The next tab visualizes your data in a table view. Each channel has it's own column.
