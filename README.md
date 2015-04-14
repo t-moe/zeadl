@@ -37,6 +37,8 @@ The last tab shows the settings of the channel data. The first element ist the s
 
 Note: High sample rates will generate a high load on the device. You'll run out of memory eventually.
 
+A list of the channels is below the samplerate settings. This list contians a checkbox and a color pick for each channel.
+
 ##How to Install
 - Beagle bone: Use the provided apk
 - Emulator: Uncomment jni build.gradle file in the app folder. Uncomment all SensorChannels that use the I2C class. Alternative: Use the ARM-Emulator which supports our jni libs.
@@ -51,6 +53,6 @@ Note: High sample rates will generate a high load on the device. You'll run out 
 
 
 ##Known Issues
-- High sample rates affect the resposabilty of the GUI.
+- High sample rates affect the responsability of the GUI.
 
 
