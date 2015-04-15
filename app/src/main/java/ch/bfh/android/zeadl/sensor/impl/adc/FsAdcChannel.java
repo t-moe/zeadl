@@ -16,6 +16,12 @@ public class FsAdcChannel extends SensorChannel {
     }
 
     public float getSample() {
+
+        GPIO.LED1.setValue(GPIO.BUTTON1.getValue());
+        GPIO.LED2.setValue(GPIO.BUTTON2.getValue());
+        GPIO.LED3.setValue(GPIO.BUTTON3.getValue());
+        GPIO.LED4.setValue(GPIO.BUTTON4.getValue());
+
         float val;
         switch (channel) {
             case ADC0:
