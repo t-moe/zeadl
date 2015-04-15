@@ -1,5 +1,7 @@
 package ch.bfh.android.zeadl.sensor;
 
+import android.os.Build;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventListener;
@@ -27,11 +29,13 @@ public final class SensorGroupController {
     private final static List<SensorGroup> mActiveSensorGroups = Collections.synchronizedList(new ArrayList<SensorGroup>());
     static {
         //Add available sensor groups here
-        mSensorGroups.add(new GroupInfo(TempSensorGroup.class));
-        mSensorGroups.add(new GroupInfo(GravitySensorGroup.class));
-        mSensorGroups.add(new GroupInfo(ColorSensorGroup.class));
+        if(!Build.FINGERPRINT.startsWith("generic")) { //not in emulator
+            mSensorGroups.add(new GroupInfo(TempSensorGroup.class));
+            mSensorGroups.add(new GroupInfo(GravitySensorGroup.class));
+            mSensorGroups.add(new GroupInfo(ColorSensorGroup.class));
+            mSensorGroups.add(new GroupInfo(ADCSensorGroup.class));
+        }
         mSensorGroups.add(new GroupInfo(DummyGroup.class));
-        mSensorGroups.add(new GroupInfo(ADCSensorGroup.class));
 
         //TODO: Find the classes automatically using reflection
     }
