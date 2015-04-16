@@ -57,11 +57,17 @@ Note: High sample rates will generate a high load on the device. You'll run out 
 A list of the channels is below the samplerate settings. This list contians a checkbox and a color pick for each channel.
 
 ##How to Install
-There are two ways to install this app on your device; you can build and run either beaglebone or emulator build. You can switch your flavor by choosing your build variant in "Build Variants":
+You can install the application either in the emulator or on the Beagle Bone Black. Use the provided apk's and follow the on-screen instructions
+
+##How to Build
+We use Android-Studio with gradle as buildsystem.
+You can build either for the beaglebone or the emulator. You can switch your flavor by choosing your build variant in the "Build Variants" Menu:
 
 <img src="https://cloud.githubusercontent.com/assets/11633618/7190150/42f6b2c4-e484-11e4-9071-693b22db8575.png" width="100" />
 
-After your choice, you can run the Android Studio Project on your device!
+After choosing the right flavor you can start the app normally via the "Run" or the "Debug" button in Android-Studio.
+
+Note: There's a start_adb.sh script in the root folder which helps you setting up the ADB connection to your beagle bone.
 
 ##How to Extend
 - Subclass SensorGroup and SensorChannel.
