@@ -34,7 +34,8 @@ Note: The app is not fully terminated if you press the "back" button multiple ti
 ###Detail View
 ####Graph
 In the Graph you see the actual measurements by channel. You can zoom and pan the Graph.
-![DetailGraph](https://cloud.githubusercontent.com/assets/11633618/7190134/388355ae-e484-11e4-9b46-b59dd39cf5d3.png" width="100" />
+
+<img src="https://cloud.githubusercontent.com/assets/11633618/7190134/388355ae-e484-11e4-9b46-b59dd39cf5d3.png" width="100" />
 
 ####Table
 The next tab visualizes your data in a table view. Each channel has it's own column.
