@@ -124,7 +124,8 @@
                                     android:layout_gravity="center_horizontal"
                                     android:nestedScrollingEnabled="true"
                                     android:id="@+id/TableData"
-                                    android:padding="5dp">
+                                    android:padding="5dp"
+                                    android:stretchColumns="*">
                                 </TableLayout>
                         </ScrollView>
 

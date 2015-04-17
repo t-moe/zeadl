@@ -40,6 +40,8 @@ public class I2C
      */
     public native boolean open();
 
+
+
     /**
      * @param buffer
      * @param length
