@@ -1,6 +1,7 @@
 package ch.bfh.android.zeadl.service;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import ch.bfh.android.zeadl.sensor.SensorChannel;
 import ch.bfh.android.zeadl.sensor.SensorGroup;
 import ch.bfh.android.zeadl.sensor.SensorGroupController;
+import ch.bfh.android.zeadl.sensor.impl.adc.GPIO;
 
 /**
  * Created by timo on 4/10/15.
@@ -92,7 +94,15 @@ public class WorkerThread extends AsyncTask implements SensorGroupController.Upd
 
         SensorGroupController.removeEventListener(this);
         for(SensorGroup sensorGroup: activeSensorGroups) {
-            sensorGroup.addEventListener(this);
+            sensorGroup.removeEventListener(this);
+        }
+
+        if(!Build.FINGERPRINT.startsWith("generic")) { //not in emulator
+            //Temporary fix, until SensorGroup.Stop() is called on app-close
+            GPIO.LED1.OFF();
+            GPIO.LED2.OFF();
+            GPIO.LED3.OFF();
+            GPIO.LED4.OFF();
         }
 
         Log.d("Zeadl Thread","Thread stopped");
