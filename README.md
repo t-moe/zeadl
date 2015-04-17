@@ -1,6 +1,8 @@
 # ZEADL extendable android data logger
 A project for the embedded android module at bfh.
 
+We recommend viewing this online: https://github.com/t-moe/zeadl
+
 ##Description: 
 ZEADL is a Datalogger for Android Devices. It offers the possibility to measure several values and show them in a handy graph view, or a table. If necessary, the table and the graph can be saved on your device for further utilisation. It runs perfectly on the BFH-Cape combined with the development board BeagleBoneBlack.
 
@@ -29,8 +31,9 @@ To see details of a Sensor Group you can simply click on it in the Overview. Thi
 
 The Detail-View has three Tabs: Graph, Table and Settings. You may return from the DetailView by pressing the "back" button.
 
-Note: The app is not fully terminated if you press the "back" button multiple times. Zeadl runs as Service (see Notificationbar) until you terminate it via Menu->Exit.
-If you choose SensorGroup ADC Sensor, the buttons will control the LED status with the speed of samplerate.
+**Note: The app is not fully terminated if you press the "back" button multiple times. Zeadl runs as Service (see Notificationbar) until you terminate it via Menu->Exit.**
+
+**If you choose SensorGroup ADC Sensor, the buttons will control the LED status with the speed of samplerate.**
 
 ###Detail View
 ####Graph
@@ -58,7 +61,8 @@ Note: High sample rates will generate a high load on the device. You'll run out 
 A list of the channels is below the samplerate settings. This list contians a checkbox and a color pick for each channel.
 
 ##How to Install
-You can install the application either in the emulator or on the Beagle Bone Black. Use the provided apk's and follow the on-screen instructions. (The "zeadl.apk" is the final signed release apk for the Beagle Bone Black)
+You can install the application either in the emulator or on the Beagle Bone Black. Use the provided apk's and follow the on-screen instructions. 
+The current apk's can be found here: https://github.com/t-moe/zeadl/releases
 
 ##How to Build
 We use Android-Studio with gradle as buildsystem.
