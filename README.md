@@ -30,6 +30,7 @@ To see details of a Sensor Group you can simply click on it in the Overview. Thi
 The Detail-View has three Tabs: Graph, Table and Settings. You may return from the DetailView by pressing the "back" button.
 
 Note: The app is not fully terminated if you press the "back" button multiple times. Zeadl runs as Service (see Notificationbar) until you terminate it via Menu->Exit.
+If you choose SensorGroup ADC Sensor, the buttons will control the LED status with the speed of samplerate.
 
 ###Detail View
 ####Graph
@@ -57,7 +58,7 @@ Note: High sample rates will generate a high load on the device. You'll run out 
 A list of the channels is below the samplerate settings. This list contians a checkbox and a color pick for each channel.
 
 ##How to Install
-You can install the application either in the emulator or on the Beagle Bone Black. Use the provided apk's and follow the on-screen instructions
+You can install the application either in the emulator or on the Beagle Bone Black. Use the provided apk's and follow the on-screen instructions. (The "zeadl.apk" is the final signed release apk for the Beagle Bone Black)
 
 ##How to Build
 We use Android-Studio with gradle as buildsystem.
